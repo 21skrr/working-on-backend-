@@ -226,7 +226,7 @@ Body:
 
 ### Delete a checklist item------------------------------------------ HNA
 
-```                                               id normal
+```id normal
 DELETE http://localhost:5000/api/checklist-items/{{itemId}}
 ```
 
@@ -373,6 +373,10 @@ endDate=2025-06-30
 programType=all
 ```
 
+1. Get All Assignments for a User
+
+http://localhost:5000/api/checklist-assignments/user/0ed16833-0684-4073-8246-6d2d9d4cc633
+
 ### Get checklist items with their status
 
 ```
@@ -402,7 +406,7 @@ Authorization: Bearer {{manager_token}}
 ### Get team's assigned checklists
 
 ```
-GET http://localhost:5000/api/checklist-assignments/team
+GET http://localhost:5000/api/checklist-assignments/team/teamid
 ```
 
 Headers:
@@ -414,7 +418,7 @@ Authorization: Bearer {{supervisor_token}}
 ### Verify checklist task completion
 
 ```
-PATCH http://localhost:5000/api/checklist-progress/71c0acca-35c9-11f0-97fc-f875a44d165a/verify
+PATCH http://localhost:5000/api/checklist-assignments/checklist-progress/22222222-2222-2222-2222-222222222222/verify
 ```
 
 Headers:
@@ -478,6 +482,9 @@ Authorization: Bearer {{employee_token}}
 ```
 PATCH http://localhost:5000/api/checklist-progress/71c0acca-35c9-11f0-97fc-f875a44d165a
 ```
+
+ATCH http://localhost:5000/api/checklist-assignments/checklist-progress/71c0cacca-35c9-11f0-97fc-f875a44d165a
+PATCH /api/checklist-assignments/checklist-progress/:progressId
 
 Headers:
 

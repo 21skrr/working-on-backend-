@@ -6,7 +6,7 @@ const { Parser } = require("json2csv");
 const getSentFeedback = async (req, res) => {
   try {
     const feedback = await Feedback.findAll({
-      where: { senderId: req.user.id },
+      where: { fromUserId: req.user.id },
       include: [
         { model: User, as: "sender" },
         { model: User, as: "receiver" },
@@ -26,7 +26,7 @@ const getReceivedFeedback = async (req, res) => {
     const whereClause =
       req.user.role === "hr"
         ? {} // all feedback
-        : { receiverId: req.user.id };
+        : { toUserId: req.user.id };
 
     const feedback = await Feedback.findAll({
       where: whereClause,
@@ -73,10 +73,10 @@ const createFeedback = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { receiverId, message, type } = req.body;
+    const { toUserId, message, type } = req.body;
     const feedback = await Feedback.create({
-      senderId: req.user.id,
-      receiverId,
+      fromUserId: req.user.id,
+      toUserId,
       message,
       type,
     });
@@ -97,7 +97,7 @@ const deleteFeedback = async (req, res) => {
     }
 
     // Only allow sender to delete their feedback
-    if (feedback.senderId !== req.user.id) {
+    if (feedback.fromUserId !== req.user.id) {
       return res.status(403).json({ message: "Not authorized" });
     }
 
@@ -124,6 +124,23 @@ const exportFeedbackCSV = async (req, res) => {
   }
 };
 
+// Get feedback for a specific user (as receiver)
+const getFeedbackByUserId = async (req, res) => {
+  try {
+    const feedback = await Feedback.findAll({
+      where: { toUserId: req.params.userId },
+      include: [
+        { model: User, as: "sender" },
+        { model: User, as: "receiver" },
+      ],
+    });
+    res.json(feedback);
+  } catch (error) {
+    console.error("Error fetching feedback by userId:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getSentFeedback,
   getReceivedFeedback,
@@ -131,4 +148,5 @@ module.exports = {
   createFeedback,
   deleteFeedback,
   exportFeedbackCSV,
+  getFeedbackByUserId,
 };

@@ -51,4 +51,54 @@ router.get("/user/:userId", auth, checklistController.getUserAssignments);
 // @access  Private
 router.get("/my", auth, checklistController.getUserAssignments);
 
+// @route   GET /api/checklist-assignments/department/:department
+// @desc    Get checklist assignments for a specific department
+// @access  Private (HR/Supervisor)
+router.get(
+  "/department/:department",
+  auth,
+  checklistController.getAssignmentsByDepartment
+);
+
+// @route   GET /api/checklist-assignments/:assignmentId/items
+// @desc    Get all items for a given checklist assignment
+// @access  Private
+router.get(
+  "/:assignmentId/items",
+  auth,
+  checklistController.getAssignmentItems
+);
+
+// @route   GET /api/checklist-assignments/:assignmentId/progress
+// @desc    Get all progress records for a given checklist assignment
+// @access  Private
+router.get(
+  "/:assignmentId/progress",
+  auth,
+  checklistController.getAssignmentProgress
+);
+
+// @route   GET /api/checklist-assignments/team/:teamId
+// @desc    Get checklist assignments for a specific team
+// @access  Private (Supervisor/HR)
+router.get("/team/:teamId", auth, checklistController.getAssignmentsByTeam);
+
+// @route   PATCH /api/checklist-progress/:progressId/verify
+// @desc    Verify a checklist item
+// @access  Private (HR/Manager)
+router.patch(
+  "/checklist-progress/:progressId/verify",
+  auth,
+  checklistController.verifyChecklistItem
+);
+
+// @route   PATCH /api/checklist-progress/:progressId
+// @desc    Update checklist progress (completion, notes, etc)
+// @access  Private
+router.patch(
+  "/checklist-progress/:progressId",
+  auth,
+  checklistController.updateChecklistProgress
+);
+
 module.exports = router;

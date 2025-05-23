@@ -1,4 +1,4 @@
-const { Notification } = require("../models");
+const { Notification, CoachingSession } = require("../models");
 const { Op } = require("sequelize");
 
 // Get user's notifications
@@ -123,6 +123,98 @@ const getAllNotifications = async (req, res) => {
   }
 };
 
+// Get reminders for upcoming/overdue items (type 'task' and unread)
+const getReminders = async (req, res) => {
+  try {
+    const reminders = await Notification.findAll({
+      where: {
+        userId: req.user.id,
+        type: "task",
+        isRead: false,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+    res.json(reminders);
+  } catch (error) {
+    console.error("Error fetching reminders:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get feedback form availability (type 'feedback' and unread)
+const getFeedbackAvailability = async (req, res) => {
+  try {
+    const feedbacks = await Notification.findAll({
+      where: {
+        userId: req.user.id,
+        type: "feedback",
+        isRead: false,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+    res.json(feedbacks);
+  } catch (error) {
+    console.error("Error fetching feedback availability:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get new document notifications (type 'document' and unread)
+const getDocumentNotifications = async (req, res) => {
+  try {
+    const documents = await Notification.findAll({
+      where: {
+        userId: req.user.id,
+        type: "document",
+        isRead: false,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+    res.json(documents);
+  } catch (error) {
+    console.error("Error fetching document notifications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get new training notifications (type 'training' and unread)
+const getTrainingNotifications = async (req, res) => {
+  try {
+    const trainings = await Notification.findAll({
+      where: {
+        userId: req.user.id,
+        type: "training",
+        isRead: false,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+    res.json(trainings);
+  } catch (error) {
+    console.error("Error fetching training notifications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get coaching session notifications (actual coaching_sessions for the user)
+const getCoachingSessionNotifications = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sessions = await CoachingSession.findAll({
+      where: {
+        [Op.or]: [
+          { userId }, // as employee
+          { supervisorId: userId }, // as supervisor
+        ],
+      },
+      order: [["scheduledFor", "DESC"]],
+    });
+    res.json(sessions);
+  } catch (error) {
+    console.error("Error fetching coaching session notifications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getUserNotifications,
   createNotification,
@@ -130,4 +222,9 @@ module.exports = {
   markAllAsRead,
   deleteNotification,
   getAllNotifications,
+  getReminders,
+  getFeedbackAvailability,
+  getDocumentNotifications,
+  getTrainingNotifications,
+  getCoachingSessionNotifications,
 };

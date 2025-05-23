@@ -22,6 +22,9 @@ router.get(
 // GET /api/feedback/export/csv (HR only)
 router.get("/export/csv", auth, isRH, feedbackController.exportFeedbackCSV);
 
+// GET /api/feedback/user/:userId
+router.get("/user/:userId", auth, feedbackController.getFeedbackByUserId);
+
 // POST /api/feedback
 router.post(
   "/",

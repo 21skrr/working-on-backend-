@@ -18,6 +18,7 @@ const ChecklistAssignment = require("./ChecklistAssignment");
 const NotificationSettings = require("./NotificationSettings");
 const OnboardingTask = require("./OnboardingTask");
 const UserTaskProgress = require("./UserTaskProgress")(sequelize);
+const Notification = require("./Notification");
 
 // User associations
 User.hasOne(OnboardingProgress);
@@ -165,4 +166,5 @@ module.exports = {
   NotificationSettings,
   OnboardingTask,
   UserTaskProgress,
+  Notification,
 };

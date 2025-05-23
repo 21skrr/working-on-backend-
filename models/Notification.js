@@ -26,18 +26,14 @@ const Notification = sequelize.define(
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM("info", "warning", "success", "error"),
+      type: DataTypes.ENUM("task", "event", "evaluation", "feedback", "system"),
       allowNull: false,
-      defaultValue: "info",
+      defaultValue: "system",
     },
     isRead: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-    },
-    link: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
   },
   {

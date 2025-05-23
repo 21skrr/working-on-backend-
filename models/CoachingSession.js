@@ -62,6 +62,7 @@ const CoachingSession = sequelize.define(
   },
   {
     timestamps: true,
+    tableName: "coaching_sessions",
   }
 );
 

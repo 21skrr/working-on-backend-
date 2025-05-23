@@ -22,4 +22,27 @@ router.delete("/:id", auth, notificationController.deleteNotification);
 // GET /api/notifications/all (admin/RH only)
 router.get("/all", auth, isRH, notificationController.getAllNotifications);
 
+// GET /api/notifications/reminders
+router.get("/reminders", auth, notificationController.getReminders);
+
+// GET /api/notifications/feedback-availability
+router.get(
+  "/feedback-availability",
+  auth,
+  notificationController.getFeedbackAvailability
+);
+
+// GET /api/notifications/documents
+router.get("/documents", auth, notificationController.getDocumentNotifications);
+
+// GET /api/notifications/training
+router.get("/training", auth, notificationController.getTrainingNotifications);
+
+// GET /api/notifications/coaching-sessions
+router.get(
+  "/coaching-sessions",
+  auth,
+  notificationController.getCoachingSessionNotifications
+);
+
 module.exports = router;
