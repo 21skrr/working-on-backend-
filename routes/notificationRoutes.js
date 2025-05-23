@@ -45,4 +45,11 @@ router.get(
   notificationController.getCoachingSessionNotifications
 );
 
+// GET /api/notifications/team-progress
+router.get(
+  "/team-progress",
+  auth,
+  notificationController.getTeamProgressNotifications
+);
+
 module.exports = router;

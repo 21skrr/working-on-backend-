@@ -202,7 +202,7 @@ const getCoachingSessionNotifications = async (req, res) => {
     const sessions = await CoachingSession.findAll({
       where: {
         [Op.or]: [
-          { userId }, // as employee
+          { employeeId: userId }, // as employee
           { supervisorId: userId }, // as supervisor
         ],
       },
@@ -211,6 +211,16 @@ const getCoachingSessionNotifications = async (req, res) => {
     res.json(sessions);
   } catch (error) {
     console.error("Error fetching coaching session notifications:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get team progress notifications
+const getTeamProgressNotifications = async (req, res) => {
+  try {
+    res.json([]); // Placeholder: return empty array
+  } catch (error) {
+    console.error("Error fetching team progress notifications:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -227,4 +237,5 @@ module.exports = {
   getDocumentNotifications,
   getTrainingNotifications,
   getCoachingSessionNotifications,
+  getTeamProgressNotifications,
 };

@@ -186,58 +186,30 @@ const updateTaskProgress = async (req, res) => {
     const { isCompleted, notes } = req.body;
     const userId = req.user.id;
 
-    // Check if task exists and is assigned to this user
-    const task = await Task.findOne({
+    // Find or create task progress
+    const [taskProgress, created] = await UserTaskProgress.findOrCreate({
       where: {
-        id: taskId,
-        userId: userId,
+        UserId: userId,
+        OnboardingTaskId: taskId,
+      },
+      defaults: {
+        isCompleted: false,
+        notes: "",
       },
     });
 
-    if (!task) {
-      return res
-        .status(404)
-        .json({ message: "Task not found or not assigned to you" });
-    }
-
-    // Update the task
-    await task.update({
-      isCompleted: isCompleted,
+    // Update the task progress
+    await taskProgress.update({
+      isCompleted:
+        isCompleted !== undefined ? isCompleted : taskProgress.isCompleted,
+      notes: notes || taskProgress.notes,
+      completedAt: isCompleted ? new Date() : null,
     });
 
-    // Check if UserTaskProgress exists for this task
-    let taskProgress = await UserTaskProgress.findOne({
-      where: {
-        OnboardingTaskId: taskId,
-        UserId: userId,
-      },
-    });
-
-    // Create or update task progress
-    if (!taskProgress) {
-      taskProgress = await UserTaskProgress.create({
-        id: uuidv4(),
-        UserId: userId,
-        OnboardingTaskId: taskId,
-        isCompleted: isCompleted,
-        notes: notes || null,
-        completedAt: isCompleted ? new Date() : null,
-      });
-    } else {
-      await taskProgress.update({
-        isCompleted: isCompleted,
-        notes: notes || taskProgress.notes,
-        completedAt: isCompleted ? new Date() : taskProgress.completedAt,
-      });
-    }
-
-    res.json({
-      task,
-      progress: taskProgress,
-    });
+    res.json(taskProgress);
   } catch (error) {
     console.error("Error updating task progress:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 

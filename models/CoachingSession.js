@@ -9,14 +9,6 @@ const CoachingSession = sequelize.define(
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
-    supervisorId: {
-      type: DataTypes.CHAR(36),
-      allowNull: false,
-      references: {
-        model: "Users",
-        key: "id",
-      },
-    },
     employeeId: {
       type: DataTypes.CHAR(36),
       allowNull: false,
@@ -25,43 +17,29 @@ const CoachingSession = sequelize.define(
         key: "id",
       },
     },
-    scheduledDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
+    supervisorId: {
+      type: DataTypes.CHAR(36),
+      allowNull: true,
+      references: {
+        model: "Users",
+        key: "id",
+      },
     },
-    actualDate: {
+    scheduledFor: {
       type: DataTypes.DATE,
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM(
-        "scheduled",
-        "completed",
-        "cancelled",
-        "rescheduled"
-      ),
-      allowNull: false,
-      defaultValue: "scheduled",
-    },
-    goal: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(20),
       allowNull: true,
     },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    outcome: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    topicTags: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
   },
   {
-    timestamps: true,
+    timestamps: false,
     tableName: "coaching_sessions",
   }
 );

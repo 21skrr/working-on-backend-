@@ -4,23 +4,20 @@ ALTER TABLE tasks ADD COLUMN supervisorNotes TEXT;
 -- Create user task progress table if it doesn't exist
 CREATE TABLE IF NOT EXISTS usertaskprogresses (
   id char(36) NOT NULL,
-  userId char(36) NOT NULL,
-  taskId char(36) NOT NULL,
-  status enum('pending','in_progress','completed') DEFAULT 'pending',
+  UserId char(36) NOT NULL,
+  OnboardingTaskId char(36) NOT NULL,
+  isCompleted TINYINT(1) NOT NULL DEFAULT 0,
   completedAt datetime DEFAULT NULL,
   notes text,
   supervisorNotes text,
-  verifiedBy char(36) DEFAULT NULL,
-  verifiedAt datetime DEFAULT NULL,
+  supervisorNotesUpdatedAt datetime DEFAULT NULL,
   createdAt datetime NOT NULL,
   updatedAt datetime NOT NULL,
   PRIMARY KEY (id),
-  KEY userId (userId),
-  KEY taskId (taskId),
-  KEY verifiedBy (verifiedBy),
-  CONSTRAINT usertaskprogresses_ibfk_1 FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT usertaskprogresses_ibfk_2 FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT usertaskprogresses_ibfk_3 FOREIGN KEY (verifiedBy) REFERENCES users (id) ON DELETE SET NULL ON UPDATE CASCADE
+  KEY UserId (UserId),
+  KEY OnboardingTaskId (OnboardingTaskId),
+  CONSTRAINT usertaskprogresses_ibfk_1 FOREIGN KEY (UserId) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT usertaskprogresses_ibfk_2 FOREIGN KEY (OnboardingTaskId) REFERENCES onboardingtasks (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Create onboarding metrics table if not exists (for dashboard data)
