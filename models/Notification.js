@@ -26,7 +26,7 @@ const Notification = sequelize.define(
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM("task", "event", "evaluation", "feedback", "system"),
+      type: DataTypes.ENUM("task", "event", "evaluation", "feedback", "system", "weekly_report"),
       allowNull: false,
       defaultValue: "system",
     },
@@ -35,6 +35,11 @@ const Notification = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    metadata: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: {},
+    },
   },
   {
     timestamps: true,
@@ -42,3 +47,4 @@ const Notification = sequelize.define(
 );
 
 module.exports = Notification;
+

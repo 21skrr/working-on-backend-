@@ -3,39 +3,22 @@ const { User } = require("../models");
 
 const auth = async (req, res, next) => {
   try {
-    // Get token from header
-    const authHeader = req.header("Authorization");
-    if (!authHeader) {
-      return res
-        .status(401)
-        .json({ message: "No token, authorization denied" });
-    }
-
-    // Verify token format
-    const token = authHeader.replace("Bearer ", "");
+    const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: "No token, authorization denied" });
+      return res.status(401).json({ message: "No token provided" });
     }
 
-    // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "your-secret-key"
-    );
-
-    // Get user from database
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findByPk(decoded.id);
+
     if (!user) {
-      return res.status(401).json({ message: "Token is not valid" });
+      return res.status(401).json({ message: "User not found" });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    console.error("Auth middleware error:", error);
-    res.status(401).json({ message: "Token is not valid" });
+    res.status(401).json({ message: "Authentication failed" });
   }
 };
 
@@ -49,8 +32,15 @@ const checkRole = (...roles) => {
 };
 
 const isRH = (req, res, next) => {
-  if (req.user.role !== "rh") {
-    return res.status(403).json({ error: "Access denied. RH only." });
+  if (req.user.role !== "hr" && req.user.role !== "HR") {
+    return res.status(403).json({ message: "Access denied. HR only." });
+  }
+  next();
+};
+
+const isSupervisor = (req, res, next) => {
+  if (req.user.role !== "supervisor") {
+    return res.status(403).json({ message: "Access denied. Supervisor only." });
   }
   next();
 };
@@ -59,4 +49,5 @@ module.exports = {
   auth,
   checkRole,
   isRH,
+  isSupervisor
 };

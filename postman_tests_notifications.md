@@ -144,7 +144,8 @@ Authorization: Bearer {{token}}
 
 ### Get Probation Deadlines
 
-**GET {{baseUrl}}/api/notifications/probation-deadlines**
+GET /api/notifications/probation-deadlines - Shows all deadlines in next 3 months
+GET /api/notifications/probation-deadlines?daysUntil=30 - Shows deadlines in next 30 days
 
 Headers:
 
@@ -198,7 +199,13 @@ Headers:
 Authorization: Bearer {{token}}
 ```
 
+
+
+## HR NOTIFICATION ENDPOINTS
+
 ### Get Summary Reports
+/api/notifications/summary-reports?period=weekly
+/api/notifications/summary-reports?period=monthly&department=Sales
 
 **GET {{baseUrl}}/api/notifications/summary-reports**
 
@@ -214,8 +221,6 @@ Query params (optional):
 period=weekly
 department=Sales
 ```
-
-## HR NOTIFICATION ENDPOINTS
 
 ### Get System Alerts
 
@@ -237,6 +242,8 @@ type=error
 ### Get New Employee Alerts
 
 **GET {{baseUrl}}/api/notifications/new-employees**
+GET /api/notifications/new-employees?days=30&department=engineering
+
 
 Headers:
 
@@ -264,6 +271,10 @@ status=pending
 ### Get Weekly Progress Reports
 
 **GET {{baseUrl}}/api/notifications/weekly-reports**
+/api/notifications/weekly-reports
+/api/notifications/weekly-reports?department=HR
+/api/notifications/weekly-reports?week=2025-W20
+/api/notifications/weekly-reports?department=HR&week=2025-W20
 
 Headers:
 

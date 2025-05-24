@@ -1,55 +1,65 @@
 const express = require("express");
 const notificationController = require("../controllers/notificationController");
-const { auth, isRH } = require("../middleware/auth");
+console.log("Available controller methods:", Object.keys(notificationController));
+
+const { auth, isRH, isSupervisor } = require("../middleware/auth");
+
+// Verify all required controller methods exist
+const requiredMethods = [
+  'getUserNotifications',
+  'createNotification',
+  'markAsRead',
+  'markAllAsRead',
+  'deleteNotification',
+  'getAllNotifications',
+  'getReminders',
+  'getDocumentNotifications',
+  'getTrainingNotifications',
+  'getCoachingSessionNotifications',
+  'getTeamProgress',
+  'getOverdueTasks',
+  'getFeedbackAvailability',
+  'getFeedbackSubmissions'
+];
+
+// Check if any required method is missing
+const missingMethods = requiredMethods.filter(method => !notificationController[method]);
+if (missingMethods.length > 0) {
+  throw new Error(`Missing controller methods: ${missingMethods.join(', ')}`);
+}
 
 const router = express.Router();
 
-// GET /api/notifications
+// General notification routes
 router.get("/", auth, notificationController.getUserNotifications);
-
-// POST /api/notifications - create a new notification
 router.post("/", auth, notificationController.createNotification);
-
-// PUT /api/notifications/:id/read
 router.put("/:id/read", auth, notificationController.markAsRead);
-
-// PUT /api/notifications/read-all
 router.put("/read-all", auth, notificationController.markAllAsRead);
-
-// DELETE /api/notifications/:id
 router.delete("/:id", auth, notificationController.deleteNotification);
 
-// GET /api/notifications/all (admin/RH only)
+// Filtered notification routes
 router.get("/all", auth, isRH, notificationController.getAllNotifications);
-
-// GET /api/notifications/reminders
 router.get("/reminders", auth, notificationController.getReminders);
-
-// GET /api/notifications/feedback-availability
-router.get(
-  "/feedback-availability",
-  auth,
-  notificationController.getFeedbackAvailability
-);
-
-// GET /api/notifications/documents
 router.get("/documents", auth, notificationController.getDocumentNotifications);
-
-// GET /api/notifications/training
 router.get("/training", auth, notificationController.getTrainingNotifications);
+router.get("/coaching-sessions", auth, notificationController.getCoachingSessionNotifications);
+router.get("/team-progress", auth, isSupervisor, notificationController.getTeamProgress);
+router.get("/overdue-tasks", auth, notificationController.getOverdueTasks);
+router.get("/feedback-availability", auth, notificationController.getFeedbackAvailability);
+router.get("/feedback-submissions", auth, notificationController.getFeedbackSubmissions);
+router.get("/weekly-reports", auth, notificationController.getWeeklyReports);
+router.get("/compliance-alerts", auth, notificationController.getComplianceAlerts);
+router.get("/leave-requests", auth, notificationController.getLeaveRequests);
 
-// GET /api/notifications/coaching-sessions
-router.get(
-  "/coaching-sessions",
-  auth,
-  notificationController.getCoachingSessionNotifications
-);
+// Preference routes
+router.get("/preferences", auth, notificationController.getNotificationPreferences);
+router.put("/preferences", auth, notificationController.updateNotificationPreferences);
 
-// GET /api/notifications/team-progress
-router.get(
-  "/team-progress",
-  auth,
-  notificationController.getTeamProgressNotifications
-);
+// Template routes - HR only
+router.get("/templates", auth, isRH, notificationController.getNotificationTemplates);
+router.post("/templates", auth, isRH, notificationController.createNotificationTemplate);
+router.get("/templates/:id", auth, isRH, notificationController.getNotificationTemplate);
+router.put("/templates/:id", auth, isRH, notificationController.updateNotificationTemplate);
+router.delete("/templates/:id", auth, isRH, notificationController.deleteNotificationTemplate);
 
 module.exports = router;

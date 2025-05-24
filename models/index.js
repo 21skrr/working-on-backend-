@@ -1,3 +1,4 @@
+const { Sequelize } = require('sequelize');
 const sequelize = require("../config/database");
 const User = require("./User");
 const OnboardingProgress = require("./OnboardingProgress");
@@ -19,6 +20,10 @@ const NotificationSettings = require("./NotificationSettings");
 const OnboardingTask = require("./OnboardingTask");
 const UserTaskProgress = require("./UserTaskProgress")(sequelize);
 const Notification = require("./Notification");
+const FeedbackForm = require("./feedbackForm");
+const FeedbackSubmission = require("./feedbackSubmission");
+const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
+const NotificationPreference = require('./notificationPreference')(sequelize, Sequelize.DataTypes);
 
 // User associations
 User.hasOne(OnboardingProgress);
@@ -144,6 +149,39 @@ OnboardingTask.hasMany(UserTaskProgress, { foreignKey: "OnboardingTaskId" });
 
 // UserTaskProgress associations - These are now defined in the model itself
 
+// Feedback Form and Submission associations
+FeedbackForm.hasMany(FeedbackSubmission, {
+  foreignKey: 'formId',
+  as: 'submissions'
+});
+
+FeedbackSubmission.belongsTo(FeedbackForm, {
+  foreignKey: 'formId',
+  as: 'form'
+});
+
+FeedbackSubmission.belongsTo(User, {
+  foreignKey: 'submitterId',
+  as: 'submitter'
+});
+
+FeedbackSubmission.belongsTo(User, {
+  foreignKey: 'reviewerId',
+  as: 'reviewer'
+});
+
+// Notification associations
+User.hasMany(Notification, { foreignKey: 'userId', as: 'notifications' });
+Notification.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+// Notification Preference associations
+User.hasMany(NotificationPreference);
+NotificationPreference.belongsTo(User);
+
+// Notification Template associations
+User.hasMany(NotificationTemplate, { foreignKey: 'createdBy', as: 'createdTemplates' });
+NotificationTemplate.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
+
 // Export models and connection
 module.exports = {
   sequelize,
@@ -167,4 +205,8 @@ module.exports = {
   OnboardingTask,
   UserTaskProgress,
   Notification,
+  FeedbackForm,
+  FeedbackSubmission,
+  NotificationTemplate,
+  NotificationPreference
 };
