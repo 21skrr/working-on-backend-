@@ -13,40 +13,59 @@ const Feedback = sequelize.define(
       type: DataTypes.CHAR(36),
       allowNull: false,
       references: {
-        model: "Users",
-        key: "id",
-      },
+        model: "users",
+        key: "id"
+      }
     },
     toUserId: {
       type: DataTypes.CHAR(36),
       allowNull: true,
       references: {
-        model: "Users",
-        key: "id",
-      },
+        model: "users",
+        key: "id"
+      }
     },
     toDepartment: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: true
     },
     type: {
       type: DataTypes.ENUM("onboarding", "training", "support", "general"),
       allowNull: false,
-      defaultValue: "general",
+      defaultValue: "general"
     },
     message: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: false
     },
     isAnonymous: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false,
-    },
+      defaultValue: false
+    }
   },
   {
-    timestamps: true,
+    tableName: "feedback",
+    modelName: "Feedback",
+    timestamps: true
   }
 );
+
+Feedback.associate = (models) => {
+  Feedback.belongsTo(models.User, {
+    foreignKey: "fromUserId",
+    as: "fromUser"
+  });
+
+  Feedback.belongsTo(models.User, {
+    foreignKey: "toUserId",
+    as: "toUser"
+  });
+
+  Feedback.hasMany(models.FeedbackNote, {
+    foreignKey: "feedbackId",
+    as: "notes"
+  });
+};
 
 module.exports = Feedback;

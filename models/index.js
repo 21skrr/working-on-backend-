@@ -24,6 +24,9 @@ const FeedbackForm = require("./feedbackForm");
 const FeedbackSubmission = require("./feedbackSubmission");
 const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
 const NotificationPreference = require('./notificationPreference')(sequelize, Sequelize.DataTypes);
+const FeedbackNote = require("./FeedbackNote");
+const FeedbackFollowup = require("./FeedbackFollowup");
+const FeedbackFollowupParticipant = require("./FeedbackFollowupParticipant");
 
 // User associations
 User.hasOne(OnboardingProgress);
@@ -182,6 +185,48 @@ NotificationPreference.belongsTo(User);
 User.hasMany(NotificationTemplate, { foreignKey: 'createdBy', as: 'createdTemplates' });
 NotificationTemplate.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
 
+// Feedback Note associations
+FeedbackNote.belongsTo(Feedback, { 
+  foreignKey: "feedbackId",
+  as: "feedback",
+  onDelete: "CASCADE"
+});
+FeedbackNote.belongsTo(User, { 
+  foreignKey: "supervisorId",
+  as: "supervisor",
+  onDelete: "CASCADE"
+});
+Feedback.hasMany(FeedbackNote, { 
+  foreignKey: "feedbackId",
+  as: "notes"
+});
+
+// Feedback Followup associations
+FeedbackFollowup.belongsTo(Feedback, {
+  foreignKey: "feedbackId",
+  as: "feedback"
+});
+FeedbackFollowup.belongsTo(User, {
+  foreignKey: "createdBy",
+  as: "creator"
+});
+FeedbackFollowup.belongsToMany(User, {
+  through: FeedbackFollowupParticipant,
+  foreignKey: "followupId",
+  otherKey: "userId",
+  as: "participants"
+});
+User.belongsToMany(FeedbackFollowup, {
+  through: FeedbackFollowupParticipant,
+  foreignKey: "userId",
+  otherKey: "followupId",
+  as: "followups"
+});
+Feedback.hasMany(FeedbackFollowup, {
+  foreignKey: "feedbackId",
+  as: "followups"
+});
+
 // Export models and connection
 module.exports = {
   sequelize,
@@ -208,5 +253,8 @@ module.exports = {
   FeedbackForm,
   FeedbackSubmission,
   NotificationTemplate,
-  NotificationPreference
+  NotificationPreference,
+  FeedbackNote,
+  FeedbackFollowup,
+  FeedbackFollowupParticipant
 };

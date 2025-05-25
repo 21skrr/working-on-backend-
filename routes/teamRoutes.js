@@ -8,6 +8,16 @@ const { auth } = require("../middleware/auth");
 // @access  Private
 router.get("/", auth, teamController.getTeamMembers);
 
+// @route   GET /api/team/feedback
+// @desc    Get team feedback
+// @access  Private
+router.get("/feedback", auth, teamController.getTeamFeedback);
+
+// @route   GET /api/team/feedback/analytics
+// @desc    Get team feedback analytics
+// @access  Private
+router.get("/feedback/analytics", auth, teamController.getTeamFeedbackAnalytics);
+
 // @route   GET /api/team/:id
 // @desc    Get team by ID
 // @access  Private

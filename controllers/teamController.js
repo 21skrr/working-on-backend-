@@ -1,5 +1,173 @@
-const { Team, User } = require("../models");
+const { Team, User, Feedback } = require("../models");
 const { Op } = require("sequelize");
+const sequelize = require("../config/database");
+
+// Get team feedback
+const getTeamFeedback = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Get team members
+    const teamMembers = await User.findAll({
+      where: { teamId: user.teamId },
+      attributes: ['id']
+    });
+
+    const teamMemberIds = teamMembers.map(member => member.id);
+
+    // Get feedback for team members
+    const feedback = await Feedback.findAll({
+      where: {
+        [Op.or]: [
+          { fromUserId: { [Op.in]: teamMemberIds } },
+          { toUserId: { [Op.in]: teamMemberIds } }
+        ]
+      },
+      include: [
+        {
+          model: User,
+          as: 'sender',
+          attributes: ['id', 'name', 'email', 'role']
+        },
+        {
+          model: User,
+          as: 'receiver',
+          attributes: ['id', 'name', 'email', 'role']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json(feedback);
+  } catch (error) {
+    console.error("Error fetching team feedback:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get team feedback analytics
+const getTeamFeedbackAnalytics = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Get team members
+    const teamMembers = await User.findAll({
+      where: { teamId: user.teamId },
+      attributes: ['id']
+    });
+
+    const teamMemberIds = teamMembers.map(member => member.id);
+
+    // Get analytics for different time periods
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(new Date().setMonth(new Date().getMonth() - 1));
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+
+    // Get feedback counts by type
+    const feedbackByType = await sequelize.query(`
+      SELECT type, COUNT(*) as count
+      FROM feedback
+      WHERE (fromUserId IN (:userIds) OR toUserId IN (:userIds))
+      AND createdAt BETWEEN :startDate AND :endDate
+      GROUP BY type
+    `, {
+      replacements: { 
+        userIds: teamMemberIds,
+        startDate,
+        endDate
+      },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    // Get feedback counts by user
+    const feedbackByUser = await sequelize.query(`
+      SELECT 
+        f.fromUserId,
+        f.toUserId,
+        COUNT(*) as count,
+        s.name as sender_name,
+        r.name as receiver_name
+      FROM feedback f
+      LEFT JOIN users s ON f.fromUserId = s.id
+      LEFT JOIN users r ON f.toUserId = r.id
+      WHERE (f.fromUserId IN (:userIds) OR f.toUserId IN (:userIds))
+      AND f.createdAt BETWEEN :startDate AND :endDate
+      GROUP BY f.fromUserId, f.toUserId
+    `, {
+      replacements: { 
+        userIds: teamMemberIds,
+        startDate,
+        endDate
+      },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    // Get feedback trend over time
+    const feedbackTrend = await sequelize.query(`
+      SELECT 
+        DATE(createdAt) as date,
+        COUNT(*) as count
+      FROM feedback
+      WHERE (fromUserId IN (:userIds) OR toUserId IN (:userIds))
+      AND createdAt BETWEEN :startDate AND :endDate
+      GROUP BY DATE(createdAt)
+      ORDER BY date ASC
+    `, {
+      replacements: { 
+        userIds: teamMemberIds,
+        startDate,
+        endDate
+      },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    // Calculate overall statistics
+    const [{ total }] = await sequelize.query(`
+      SELECT COUNT(*) as total
+      FROM feedback
+      WHERE (fromUserId IN (:userIds) OR toUserId IN (:userIds))
+      AND createdAt BETWEEN :startDate AND :endDate
+    `, {
+      replacements: { 
+        userIds: teamMemberIds,
+        startDate,
+        endDate
+      },
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    res.json({
+      overview: {
+        totalFeedback: total,
+        dateRange: {
+          start: startDate,
+          end: endDate
+        }
+      },
+      byType: feedbackByType,
+      byUser: feedbackByUser.map(item => ({
+        fromUserId: item.fromUserId,
+        toUserId: item.toUserId,
+        count: item.count,
+        sender: { name: item.sender_name },
+        receiver: { name: item.receiver_name }
+      })),
+      trend: feedbackTrend
+    });
+
+  } catch (error) {
+    console.error("Error fetching team feedback analytics:", error);
+    res.status(500).json({ 
+      message: "Server error",
+      details: error.message 
+    });
+  }
+};
 
 // @desc    Get team members
 // @route   GET /api/team
@@ -146,4 +314,6 @@ module.exports = {
   createTeam,
   updateTeam,
   deleteTeam,
+  getTeamFeedback,
+  getTeamFeedbackAnalytics
 };
