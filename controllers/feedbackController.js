@@ -3,6 +3,8 @@ const { validationResult } = require("express-validator");
 const { Parser } = require("json2csv");
 const { Op } = require("sequelize");
 const { v4: uuidv4 } = require('uuid');
+const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 
 // Get sent feedback
 const getSentFeedback = async (req, res) => {
@@ -305,19 +307,85 @@ const exportFeedback = async (req, res) => {
       };
     });
 
-    // Export based on format
-    if (format === 'csv') {
-      const fields = Object.keys(formattedData[0] || {});
-      const parser = new Parser({ fields });
-      const csv = parser.parse(formattedData);
-      
-      res.header('Content-Type', 'text/csv');
-      res.attachment(`feedback_report_${dateRange}_${category}_${new Date().toISOString().split('T')[0]}.csv`);
-      return res.send(csv);
-    }
+    const filename = `feedback_report_${dateRange}_${category}_${new Date().toISOString().split('T')[0]}`;
 
-    // Default JSON response
-    res.json(formattedData);
+    // Export based on format
+    switch (format) {
+      case 'csv': {
+        const fields = Object.keys(formattedData[0] || {});
+        const parser = new Parser({ fields });
+        const csv = parser.parse(formattedData);
+        
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`${filename}.csv`);
+        return res.send(csv);
+      }
+
+      case 'excel': {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Feedback Report');
+        
+        // Add headers
+        const headers = Object.keys(formattedData[0] || {});
+        worksheet.addRow(headers);
+        
+        // Add data
+        formattedData.forEach(feedback => {
+          worksheet.addRow(Object.values(feedback));
+        });
+        
+        // Style the header row
+        worksheet.getRow(1).font = { bold: true };
+        
+        res.header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.attachment(`${filename}.xlsx`);
+        return workbook.xlsx.write(res);
+      }
+
+      case 'pdf': {
+        const doc = new PDFDocument();
+        
+        res.header('Content-Type', 'application/pdf');
+        res.attachment(`${filename}.pdf`);
+        
+        doc.pipe(res);
+        
+        // Add title
+        doc.fontSize(16).text('Feedback Report', { align: 'center' });
+        doc.moveDown();
+        
+        // Add filters info
+        doc.fontSize(12).text(`Date Range: ${dateRange}`);
+        doc.text(`Category: ${category}`);
+        doc.moveDown();
+        
+        // Add table headers
+        const headers = Object.keys(formattedData[0] || {});
+        let yPosition = doc.y;
+        
+        // Add data rows
+        formattedData.forEach((feedback, index) => {
+          if (doc.y > 700) { // Check if near page end
+            doc.addPage();
+            yPosition = doc.y;
+          }
+          
+          doc.fontSize(10).text(
+            Object.values(feedback).join(' | '),
+            { width: 500 }
+          );
+          doc.moveDown(0.5);
+        });
+        
+        doc.end();
+        return;
+      }
+
+      default: {
+        // JSON format
+        return res.json(formattedData);
+      }
+    }
   } catch (error) {
     console.error("Error exporting feedback:", error);
     res.status(500).json({ message: "Server error" });

@@ -28,9 +28,18 @@ router.get(
   [
     auth,
     checkRole("hr"),
-    check("format").optional().isIn(["csv"]).withMessage("Format must be csv"),
-    check("dateRange").optional().isIn(["daily", "weekly", "monthly", "yearly"]).withMessage("Invalid date range"),
-    check("category").optional().isIn(["all", "onboarding", "training", "support", "general"]).withMessage("Invalid category")
+    check("format")
+      .optional()
+      .isIn(["csv", "excel", "pdf", "json"])
+      .withMessage("Format must be one of: csv, excel, pdf, json"),
+    check("dateRange")
+      .optional()
+      .isIn(["daily", "weekly", "monthly", "yearly"])
+      .withMessage("Invalid date range"),
+    check("category")
+      .optional()
+      .isIn(["all", "onboarding", "training", "support", "general"])
+      .withMessage("Invalid category")
   ],
   feedbackController.exportFeedback
 );
