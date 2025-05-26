@@ -1,4 +1,4 @@
-const { Notification, CoachingSession, User, Team, OnboardingProgress, ChecklistAssignment, Task, FeedbackSubmission, FeedbackForm, NotificationPreference, NotificationTemplate } = require("../models");
+const { Notification, CoachingSession, User, Team, OnboardingProgress, ChecklistAssignment, Task, FeedbackSubmission, FeedbackForm, notification_preferences, NotificationTemplate } = require("../models");
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const { v4: uuidv4 } = require('uuid');
@@ -423,13 +423,13 @@ const getLeaveRequests = async (req, res) => {
 // Get user's notification preferences
 const getNotificationPreferences = async (req, res) => {
   try {
-    let preferences = await NotificationPreference.findOne({
+    let preferences = await notification_preferences.findOne({
       where: { userId: req.user.id },
     });
 
     // If no preferences exist, create default ones
     if (!preferences) {
-      preferences = await NotificationPreference.create({
+      preferences = await notification_preferences.create({
         userId: req.user.id,
       });
     }
@@ -446,12 +446,12 @@ const updateNotificationPreferences = async (req, res) => {
   try {
     const { emailNotifications, pushNotifications, notificationTypes, quietHours } = req.body;
 
-    let preferences = await NotificationPreference.findOne({
+    let preferences = await notification_preferences.findOne({
       where: { userId: req.user.id },
     });
 
     if (!preferences) {
-      preferences = await NotificationPreference.create({
+      preferences = await notification_preferences.create({
         userId: req.user.id,
         emailNotifications,
         pushNotifications,

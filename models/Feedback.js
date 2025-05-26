@@ -26,7 +26,7 @@ const Feedback = sequelize.define(
       }
     },
     toDepartment: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: true
     },
     type: {
@@ -39,9 +39,28 @@ const Feedback = sequelize.define(
       allowNull: false
     },
     isAnonymous: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.TINYINT(1),
       allowNull: false,
-      defaultValue: false
+      defaultValue: 0
+    },
+    status: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    categories: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('categories');
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+      set(value) {
+        this.setDataValue('categories', JSON.stringify(value));
+      }
+    },
+    priority: {
+      type: DataTypes.ENUM('low', 'medium', 'high'),
+      allowNull: true
     }
   },
   {
@@ -54,12 +73,12 @@ const Feedback = sequelize.define(
 Feedback.associate = (models) => {
   Feedback.belongsTo(models.User, {
     foreignKey: "fromUserId",
-    as: "fromUser"
+    as: "sender"
   });
 
   Feedback.belongsTo(models.User, {
     foreignKey: "toUserId",
-    as: "toUser"
+    as: "receiver"
   });
 
   Feedback.hasMany(models.FeedbackNote, {

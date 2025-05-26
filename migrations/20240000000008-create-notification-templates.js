@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('NotificationTemplates', {
+    await queryInterface.createTable('notificationtemplates', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -50,7 +50,7 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -69,12 +69,12 @@ module.exports = {
     });
 
     // Add indexes
-    await queryInterface.addIndex('NotificationTemplates', ['type']);
-    await queryInterface.addIndex('NotificationTemplates', ['isActive']);
-    await queryInterface.addIndex('NotificationTemplates', ['createdBy']);
+    await queryInterface.addIndex('notificationtemplates', ['type']);
+    await queryInterface.addIndex('notificationtemplates', ['isActive']);
+    await queryInterface.addIndex('notificationtemplates', ['createdBy']);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('NotificationTemplates');
+    await queryInterface.dropTable('notificationtemplates');
   }
 }; 

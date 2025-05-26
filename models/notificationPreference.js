@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const NotificationPreference = sequelize.define(
-    "NotificationPreference",
+    "notification_preferences",
     {
       id: {
         type: DataTypes.UUID,
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-          model: "Users",
+          model: "users",
           key: "id",
         },
       },
@@ -54,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+      tableName: 'notification_preferences',
       timestamps: true,
     }
   );

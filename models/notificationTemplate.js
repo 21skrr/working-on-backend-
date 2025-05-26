@@ -1,18 +1,17 @@
 module.exports = (sequelize, DataTypes) => {
   const NotificationTemplate = sequelize.define(
-    "NotificationTemplate",
+    "notificationtemplates",
     {
       id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.STRING(36),
         primaryKey: true,
       },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
       },
       title: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
       },
       message: {
@@ -38,24 +37,34 @@ module.exports = (sequelize, DataTypes) => {
       metadata: {
         type: DataTypes.JSON,
         allowNull: true,
-        defaultValue: {},
       },
       isActive: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: true
       },
       createdBy: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING(36),
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id',
         },
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      }
     },
     {
-      timestamps: true,
+      tableName: 'notificationtemplates',
+      timestamps: true
     }
   );
 

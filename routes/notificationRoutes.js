@@ -19,7 +19,14 @@ const requiredMethods = [
   'getTeamProgress',
   'getOverdueTasks',
   'getFeedbackAvailability',
-  'getFeedbackSubmissions'
+  'getFeedbackSubmissions',
+  'getNotificationPreferences',
+  'updateNotificationPreferences',
+  'getNotificationTemplates',
+  'createNotificationTemplate',
+  'getNotificationTemplate',
+  'updateNotificationTemplate',
+  'deleteNotificationTemplate'
 ];
 
 // Check if any required method is missing
@@ -47,19 +54,29 @@ router.get("/team-progress", auth, isSupervisor, notificationController.getTeamP
 router.get("/overdue-tasks", auth, notificationController.getOverdueTasks);
 router.get("/feedback-availability", auth, notificationController.getFeedbackAvailability);
 router.get("/feedback-submissions", auth, notificationController.getFeedbackSubmissions);
-router.get("/weekly-reports", auth, notificationController.getWeeklyReports);
 router.get("/compliance-alerts", auth, notificationController.getComplianceAlerts);
-router.get("/leave-requests", auth, notificationController.getLeaveRequests);
 
-// Preference routes
-router.get("/preferences", auth, notificationController.getNotificationPreferences);
-router.put("/preferences", auth, notificationController.updateNotificationPreferences);
-
-// Template routes - HR only
+// Add both old and new routes for backward compatibility
+// Old routes
 router.get("/templates", auth, isRH, notificationController.getNotificationTemplates);
 router.post("/templates", auth, isRH, notificationController.createNotificationTemplate);
 router.get("/templates/:id", auth, isRH, notificationController.getNotificationTemplate);
 router.put("/templates/:id", auth, isRH, notificationController.updateNotificationTemplate);
 router.delete("/templates/:id", auth, isRH, notificationController.deleteNotificationTemplate);
+
+// New routes
+router.get("/notificationtemplates", auth, isRH, notificationController.getNotificationTemplates);
+router.post("/notificationtemplates", auth, isRH, notificationController.createNotificationTemplate);
+router.get("/notificationtemplates/:id", auth, isRH, notificationController.getNotificationTemplate);
+router.put("/notificationtemplates/:id", auth, isRH, notificationController.updateNotificationTemplate);
+router.delete("/notificationtemplates/:id", auth, isRH, notificationController.deleteNotificationTemplate);
+
+// Old preference routes
+router.get("/preferences", auth, notificationController.getNotificationPreferences);
+router.put("/preferences", auth, notificationController.updateNotificationPreferences);
+
+// New preference routes
+router.get("/notification_preferences", auth, notificationController.getNotificationPreferences);
+router.put("/notification_preferences", auth, notificationController.updateNotificationPreferences);
 
 module.exports = router;

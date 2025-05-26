@@ -35,20 +35,12 @@ const FeedbackNote = sequelize.define("feedback_notes", {
     type: DataTypes.ENUM("pending", "in-progress", "completed"),
     allowNull: true,
     defaultValue: "pending"
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: sequelize.literal("CURRENT_TIMESTAMP")
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: sequelize.literal("CURRENT_TIMESTAMP")
   }
 }, {
   tableName: "feedback_notes",
-  timestamps: false
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
 // Define associations

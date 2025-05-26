@@ -22,11 +22,13 @@ const UserTaskProgress = require("./UserTaskProgress")(sequelize);
 const Notification = require("./Notification");
 const FeedbackForm = require("./feedbackForm");
 const FeedbackSubmission = require("./feedbackSubmission");
-const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
-const NotificationPreference = require('./notificationPreference')(sequelize, Sequelize.DataTypes);
 const FeedbackNote = require("./FeedbackNote");
 const FeedbackFollowup = require("./FeedbackFollowup");
 const FeedbackFollowupParticipant = require("./FeedbackFollowupParticipant");
+
+// Initialize notification models
+const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
+const NotificationPreference = require('./notificationPreference')(sequelize, Sequelize.DataTypes);
 
 // User associations
 User.hasOne(OnboardingProgress);
@@ -178,8 +180,8 @@ User.hasMany(Notification, { foreignKey: 'userId', as: 'notifications' });
 Notification.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 // Notification Preference associations
-User.hasMany(NotificationPreference);
-NotificationPreference.belongsTo(User);
+User.hasOne(NotificationPreference, { foreignKey: 'userId' });
+NotificationPreference.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 // Notification Template associations
 User.hasMany(NotificationTemplate, { foreignKey: 'createdBy', as: 'createdTemplates' });
@@ -252,9 +254,9 @@ module.exports = {
   Notification,
   FeedbackForm,
   FeedbackSubmission,
-  NotificationTemplate,
-  NotificationPreference,
   FeedbackNote,
   FeedbackFollowup,
-  FeedbackFollowupParticipant
+  FeedbackFollowupParticipant,
+  NotificationTemplate,
+  notification_preferences: NotificationPreference
 };
