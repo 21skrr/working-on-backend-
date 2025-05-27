@@ -90,6 +90,12 @@ User.associate = (models) => {
     foreignKey: 'supervisorId',
     as: 'feedbackNotes'
   });
+
+  // Add association with SurveyResponse
+  User.hasMany(models.SurveyResponse, {
+    foreignKey: 'userId',
+    as: 'surveyResponses'
+  });
 };
 
 User.prototype.checkPassword = function (password) {

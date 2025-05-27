@@ -25,6 +25,7 @@ const checklistAssignmentRoutes = require("./routes/checklistAssignmentRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const supervisorRoutes = require("./routes/supervisorRoutes");
+const organizationAnalyticsRoutes = require('./routes/organizationAnalyticsRoutes');
 
 const app = express();
 // Middleware
@@ -62,6 +63,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/supervisor", supervisorRoutes);
 app.use("/api/onboarding/tasks", taskRoutes);
+app.use('/api/analytics/organization', organizationAnalyticsRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

@@ -127,6 +127,10 @@ Authorization: Bearer {{token}}
 Headers:
 ```
 Authorization: Bearer {{token}}
+
+
+
+With filters: http://localhost:5000/api/feedback/all?type=onboarding&status=pending&startDate=2024-01-01&endDate=2024-12-31
 ```
 
 ### Categorize Feedback
@@ -168,6 +172,8 @@ Body:
 ### Export Feedback Report
 
 **GET {{baseUrl}}/api/feedback/export**
+
+?format=csv
 
 Headers:
 ```

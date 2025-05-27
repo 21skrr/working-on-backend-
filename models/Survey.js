@@ -10,7 +10,7 @@ const Survey = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
     },
     title: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
     description: {
@@ -26,14 +26,20 @@ const Survey = sequelize.define(
         "general"
       ),
       defaultValue: "general",
+      allowNull: true,
     },
     status: {
       type: DataTypes.ENUM("draft", "active", "completed"),
       defaultValue: "draft",
+      allowNull: true,
     },
     createdBy: {
       type: DataTypes.CHAR(36),
       allowNull: false,
+      references: {
+        model: "users",
+        key: "id"
+      }
     },
     dueDate: {
       type: DataTypes.DATE,
@@ -42,6 +48,7 @@ const Survey = sequelize.define(
     targetRole: {
       type: DataTypes.ENUM("employee", "supervisor", "manager", "hr", "all"),
       defaultValue: "employee",
+      allowNull: true,
     },
     targetProgram: {
       type: DataTypes.ENUM(
@@ -53,11 +60,42 @@ const Survey = sequelize.define(
         "all"
       ),
       defaultValue: "all",
+      allowNull: true,
     },
+    isTemplate: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    }
   },
   {
+    tableName: 'surveys',
     timestamps: true,
   }
 );
+
+// Define associations
+Survey.associate = (models) => {
+  Survey.belongsTo(models.User, {
+    foreignKey: 'createdBy',
+    as: 'creator'
+  });
+  Survey.hasMany(models.SurveyQuestion, {
+    foreignKey: 'surveyId',
+    as: 'questions'
+  });
+  Survey.hasMany(models.SurveyResponse, {
+    foreignKey: 'surveyId',
+    as: 'responses'
+  });
+};
 
 module.exports = Survey;

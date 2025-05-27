@@ -13,7 +13,7 @@ const SurveyQuestionResponse = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "SurveyResponses",
+        model: "surveyresponses",
         key: "id",
       },
     },
@@ -21,7 +21,7 @@ const SurveyQuestionResponse = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "SurveyQuestions",
+        model: "surveyquestions",
         key: "id",
       },
     },
@@ -39,8 +39,21 @@ const SurveyQuestionResponse = sequelize.define(
     },
   },
   {
+    tableName: 'surveyquestionresponses',
     timestamps: true,
   }
 );
+
+// Define associations
+SurveyQuestionResponse.associate = (models) => {
+  SurveyQuestionResponse.belongsTo(models.SurveyResponse, {
+    foreignKey: 'surveyResponseId',
+    as: 'response'
+  });
+  SurveyQuestionResponse.belongsTo(models.SurveyQuestion, {
+    foreignKey: 'questionId',
+    as: 'question'
+  });
+};
 
 module.exports = SurveyQuestionResponse;

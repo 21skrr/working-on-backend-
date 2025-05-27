@@ -25,6 +25,14 @@ const FeedbackSubmission = require("./feedbackSubmission");
 const FeedbackNote = require("./FeedbackNote");
 const FeedbackFollowup = require("./FeedbackFollowup");
 const FeedbackFollowupParticipant = require("./FeedbackFollowupParticipant");
+const SurveyQuestion = require("./SurveyQuestion");
+const SurveyResponse = require("./SurveyResponse");
+const SurveyQuestionResponse = require("./SurveyQuestionResponse");
+const SurveySchedule = require("./surveySchedule")(sequelize);
+const SurveySettings = require("./SurveySettings");
+const AnalyticsDashboard = require("./AnalyticsDashboard");
+const AnalyticsMetric = require("./AnalyticsMetric");
+const Department = require("./Department");
 
 // Initialize notification models
 const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
@@ -33,6 +41,14 @@ const NotificationPreference = require('./notificationPreference')(sequelize, Se
 // User associations
 User.hasOne(OnboardingProgress);
 OnboardingProgress.belongsTo(User);
+
+// Department associations
+Department.hasMany(User, { foreignKey: 'department' });
+User.belongsTo(Department, { foreignKey: 'department' });
+
+// Department-Program associations
+Department.belongsToMany(Program, { through: 'department_programs' });
+Program.belongsToMany(Department, { through: 'department_programs' });
 
 User.hasMany(Task, { foreignKey: "userId" });
 Task.belongsTo(User, { foreignKey: "userId" });
@@ -55,6 +71,26 @@ Course.belongsTo(User, { as: "creator", foreignKey: "createdBy" });
 
 User.hasMany(Survey, { as: "createdSurveys", foreignKey: "createdBy" });
 Survey.belongsTo(User, { as: "creator", foreignKey: "createdBy" });
+
+// Survey and SurveyQuestion associations
+Survey.hasMany(SurveyQuestion, { foreignKey: "surveyId", as: "SurveyQuestions" });
+SurveyQuestion.belongsTo(Survey, { foreignKey: "surveyId" });
+
+// Survey and SurveyResponse associations
+Survey.hasMany(SurveyResponse, { foreignKey: "surveyId", as: "responses" });
+SurveyResponse.belongsTo(Survey, { foreignKey: "surveyId", as: "survey" });
+
+// User and SurveyResponse associations
+User.hasMany(SurveyResponse, { foreignKey: "userId", as: "surveyResponses" });
+SurveyResponse.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+// SurveyResponse and SurveyQuestionResponse associations
+SurveyResponse.hasMany(SurveyQuestionResponse, { foreignKey: "surveyResponseId", as: "questionResponses" });
+SurveyQuestionResponse.belongsTo(SurveyResponse, { foreignKey: "surveyResponseId" });
+
+// SurveyQuestion and SurveyQuestionResponse associations
+SurveyQuestion.hasMany(SurveyQuestionResponse, { foreignKey: "questionId" });
+SurveyQuestionResponse.belongsTo(SurveyQuestion, { foreignKey: "questionId", as: "question" });
 
 // Checklist associations
 User.hasMany(Checklist, { as: "createdChecklists", foreignKey: "createdBy" });
@@ -229,6 +265,21 @@ Feedback.hasMany(FeedbackFollowup, {
   as: "followups"
 });
 
+// Add Survey Schedule associations
+Survey.hasMany(SurveySchedule, { foreignKey: 'surveyId', as: 'schedules' });
+SurveySchedule.belongsTo(Survey, { foreignKey: 'surveyId', as: 'survey' });
+
+// Analytics associations
+User.hasMany(AnalyticsMetric, { foreignKey: 'created_by', as: 'createdMetrics' });
+AnalyticsMetric.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+
+// Initialize associations
+Object.keys(module.exports).forEach((modelName) => {
+  if (module.exports[modelName].associate) {
+    module.exports[modelName].associate(module.exports);
+  }
+});
+
 // Export models and connection
 module.exports = {
   sequelize,
@@ -239,6 +290,11 @@ module.exports = {
   EventParticipant,
   Course,
   Survey,
+  SurveyQuestion,
+  SurveyResponse,
+  SurveyQuestionResponse,
+  SurveySchedule,
+  SurveySettings,
   CoachingSession,
   Evaluation,
   Feedback,
@@ -258,5 +314,8 @@ module.exports = {
   FeedbackFollowup,
   FeedbackFollowupParticipant,
   NotificationTemplate,
-  notification_preferences: NotificationPreference
+  notification_preferences: NotificationPreference,
+  analytics_dashboards: AnalyticsDashboard,
+  analytics_metrics: AnalyticsMetric,
+  Department
 };
