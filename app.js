@@ -26,6 +26,9 @@ const reportRoutes = require("./routes/reportRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const supervisorRoutes = require("./routes/supervisorRoutes");
 const organizationAnalyticsRoutes = require('./routes/organizationAnalyticsRoutes');
+const personalAnalyticsRoutes = require('./routes/personalAnalyticsRoutes');
+const teamAnalyticsRoutes = require('./routes/teamAnalyticsRoutes');
+const departmentAnalyticsRoutes = require('./routes/departmentAnalyticsRoutes');
 
 const app = express();
 // Middleware
@@ -64,6 +67,9 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/supervisor", supervisorRoutes);
 app.use("/api/onboarding/tasks", taskRoutes);
 app.use('/api/analytics/organization', organizationAnalyticsRoutes);
+app.use('/api/analytics/personal', personalAnalyticsRoutes);
+app.use('/api/analytics/team', teamAnalyticsRoutes);
+app.use('/api/analytics/department', departmentAnalyticsRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

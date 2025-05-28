@@ -64,6 +64,7 @@ const ChecklistProgress = sequelize.define(
   },
   {
     timestamps: true,
+    tableName: "checklistprogresses"
   }
 );
 

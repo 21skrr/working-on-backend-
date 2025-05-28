@@ -43,12 +43,8 @@ User.hasOne(OnboardingProgress);
 OnboardingProgress.belongsTo(User);
 
 // Department associations
-Department.hasMany(User, { foreignKey: 'department' });
-User.belongsTo(Department, { foreignKey: 'department' });
-
-// Department-Program associations
-Department.belongsToMany(Program, { through: 'department_programs' });
-Program.belongsToMany(Department, { through: 'department_programs' });
+Department.hasMany(User, { foreignKey: 'department', as: 'departmentUsers' });
+User.belongsTo(Department, { foreignKey: 'department', as: 'departmentInfo' });
 
 User.hasMany(Task, { foreignKey: "userId" });
 Task.belongsTo(User, { foreignKey: "userId" });
@@ -269,10 +265,6 @@ Feedback.hasMany(FeedbackFollowup, {
 Survey.hasMany(SurveySchedule, { foreignKey: 'surveyId', as: 'schedules' });
 SurveySchedule.belongsTo(Survey, { foreignKey: 'surveyId', as: 'survey' });
 
-// Analytics associations
-User.hasMany(AnalyticsMetric, { foreignKey: 'created_by', as: 'createdMetrics' });
-AnalyticsMetric.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
-
 // Initialize associations
 Object.keys(module.exports).forEach((modelName) => {
   if (module.exports[modelName].associate) {
@@ -319,3 +311,5 @@ module.exports = {
   analytics_metrics: AnalyticsMetric,
   Department
 };
+
+console.log("Registered models:", Object.keys(module.exports));

@@ -1,4 +1,47 @@
 # Reports & Analytics API Endpoints Documentation
+## Employee Role Endpoints
+
+### Personal Analytics
+- `GET /api/analytics/personal/dashboard` - Get personal analytics dashboard
+- `GET /api/analytics/personal/onboarding` - Get personal onboarding analytics
+- `GET /api/analytics/personal/checklist` - Get checklist completion percentage
+- `GET /api/analytics/personal/training` - Get training progress
+- `GET /api/analytics/personal/feedback` - Get feedback history
+
+### Personal Reports
+- `GET /api/reports/personal/tasks` - Get completed tasks report
+- `GET /api/reports/personal/sessions` - Get attended sessions report
+- `GET /api/reports/personal/feedback` - Get submitted feedback report
+- `GET /api/reports/personal/performance` - Get individual performance summary (if permitted)
+
+## Supervisor Role Endpoints
+
+### Team Analytics
+- `GET /api/analytics/team/dashboard` - Get team-level analytics dashboard
+- `GET /api/analytics/team/checklist-progress` - Get checklist progress per employee
+- `GET /api/analytics/team/training` - Get training participation and completion
+- `GET /api/analytics/team/feedback` - Get feedback trends (non-anonymous)
+- `GET /api/analytics/team/coaching` - Get coaching session tracking and notes
+
+### Report Generation
+- `GET /api/reports/team/export` - Export team reports
+- `GET /api/reports/team/bottlenecks` - Get onboarding bottlenecks analysis
+- `GET /api/reports/team/performance` - Get team performance reports
+
+## Manager Role Endpoints
+
+### Department Analytics
+- `GET /api/analytics/department/dashboard` - Get department-wide analytics dashboard
+- `GET /api/analytics/department/onboarding-kpi` - Get onboarding KPIs per team/supervisor
+- `GET /api/analytics/department/probation` - Get probation milestone tracking and task adherence
+- `GET /api/analytics/department/evaluations` - Get evaluation results comparison across teams
+- `GET /api/analytics/department/feedback` - Get feedback and satisfaction trends
+
+### Monitoring & Reports
+- `GET /api/reports/supervisor-activity` - Get supervisor activity reports
+- `GET /api/reports/onboarding-health` - Get employee onboarding health metrics
+- `POST /api/reports/schedule/department` - Schedule department-specific reports
+- `GET /api/reports/export/department` - Export department reports
 
 ## HR Role Endpoints
 
@@ -30,49 +73,8 @@
 - `GET /api/analytics/program/:programId` - Get aggregated program insights
 - `GET /api/analytics/kpi` - Get HR KPI metrics and trends
 
-## Manager Role Endpoints
 
-### Department Analytics
-- `GET /api/analytics/department/dashboard` - Get department-wide analytics dashboard
-- `GET /api/analytics/department/onboarding-kpi` - Get onboarding KPIs per team/supervisor
-- `GET /api/analytics/department/probation` - Get probation milestone tracking and task adherence
-- `GET /api/analytics/department/evaluations` - Get evaluation results comparison across teams
-- `GET /api/analytics/department/feedback` - Get feedback and satisfaction trends
 
-### Monitoring & Reports
-- `GET /api/reports/supervisor-activity` - Get supervisor activity reports
-- `GET /api/reports/onboarding-health` - Get employee onboarding health metrics
-- `POST /api/reports/schedule/department` - Schedule department-specific reports
-- `GET /api/reports/export/department` - Export department reports
-
-## Supervisor Role Endpoints
-
-### Team Analytics
-- `GET /api/analytics/team/dashboard` - Get team-level analytics dashboard
-- `GET /api/analytics/team/checklist-progress` - Get checklist progress per employee
-- `GET /api/analytics/team/training` - Get training participation and completion
-- `GET /api/analytics/team/feedback` - Get feedback trends (non-anonymous)
-- `GET /api/analytics/team/coaching` - Get coaching session tracking and notes
-
-### Report Generation
-- `GET /api/reports/team/export` - Export team reports
-- `GET /api/reports/team/bottlenecks` - Get onboarding bottlenecks analysis
-- `GET /api/reports/team/performance` - Get team performance reports
-
-## Employee Role Endpoints
-
-### Personal Analytics
-- `GET /api/analytics/personal/dashboard` - Get personal analytics dashboard
-- `GET /api/analytics/personal/onboarding` - Get personal onboarding analytics
-- `GET /api/analytics/personal/checklist` - Get checklist completion percentage
-- `GET /api/analytics/personal/training` - Get training progress
-- `GET /api/analytics/personal/feedback` - Get feedback history
-
-### Personal Reports
-- `GET /api/reports/personal/tasks` - Get completed tasks report
-- `GET /api/reports/personal/sessions` - Get attended sessions report
-- `GET /api/reports/personal/feedback` - Get submitted feedback report
-- `GET /api/reports/personal/performance` - Get individual performance summary (if permitted)
 
 ## Common Features
 
