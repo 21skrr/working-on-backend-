@@ -11,7 +11,6 @@ const {
 } = require("../models");
 
 const ChecklistProgress = require("../models/ChecklistProgress");
-console.log("DEBUG ChecklistProgress:", ChecklistProgress);
 const { Op } = require("sequelize");
 
 console.log("Training:", Training);

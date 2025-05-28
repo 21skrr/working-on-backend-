@@ -33,6 +33,7 @@ const SurveySettings = require("./SurveySettings");
 const AnalyticsDashboard = require("./AnalyticsDashboard");
 const AnalyticsMetric = require("./AnalyticsMetric");
 const Department = require("./Department");
+const EvaluationCriteria = require("./EvaluationCriteria");
 
 // Initialize notification models
 const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
@@ -157,15 +158,22 @@ User.hasMany(Evaluation, {
 });
 User.hasMany(Evaluation, {
   as: "supervisorEvaluations",
-  foreignKey: "supervisorId",
+  foreignKey: "evaluatorId",
 });
 User.hasMany(Evaluation, {
   as: "reviewerEvaluations",
   foreignKey: "reviewedBy",
 });
 Evaluation.belongsTo(User, { as: "employee", foreignKey: "employeeId" });
-Evaluation.belongsTo(User, { as: "supervisor", foreignKey: "supervisorId" });
+Evaluation.belongsTo(User, {
+  as: "supervisor",
+  foreignKey: "evaluatorId",
+});
 Evaluation.belongsTo(User, { as: "reviewer", foreignKey: "reviewedBy" });
+
+// Evaluation and EvaluationCriteria associations
+Evaluation.hasMany(EvaluationCriteria, { foreignKey: 'evaluationId', as: 'criteria' });
+EvaluationCriteria.belongsTo(Evaluation, { foreignKey: 'evaluationId', as: 'evaluation' });
 
 // Feedback associations
 User.hasMany(Feedback, { as: "sentFeedback", foreignKey: "fromUserId" });

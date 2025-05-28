@@ -7,7 +7,10 @@ const {
   getFeedbackParticipation,
   getSurveyTrends,
   getTrainingCompletion,
-  getEvaluationEffectiveness
+  getEvaluationEffectiveness,
+  getUserAnalytics,
+  getProgramAnalytics,
+  getOrganizationKPIs
 } = require('../controllers/organizationAnalyticsController');
 
 // HR organization-wide analytics routes
@@ -18,4 +21,14 @@ router.get('/survey-trends', auth, getSurveyTrends);
 router.get('/training-completion', auth, getTrainingCompletion);
 router.get('/evaluation-effectiveness', auth, getEvaluationEffectiveness);
 
+// User-specific analytics route
+router.get('/user/:userId', auth, getUserAnalytics);
+
+// Program-specific analytics route
+router.get('/program/:programId', auth, getProgramAnalytics);
+
+// Organization-wide KPIs route (Placeholder)
+router.get('/kpi', auth, getOrganizationKPIs);
+
 module.exports = router;
+ 

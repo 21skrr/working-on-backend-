@@ -69,9 +69,10 @@
 - `GET /api/reports/export/custom` - Export custom reports
 
 ### Detailed Analytics
-- `GET /api/analytics/user/:userId` - Get detailed user-level data
-- `GET /api/analytics/program/:programId` - Get aggregated program insights
-- `GET /api/analytics/kpi` - Get HR KPI metrics and trends
+- `GET /api/analytics/organization/user/:userId` - Get detailed user-level data
+- `GET /api/analytics/organization/program/:programId` - Get aggregated program insights
+- `GET /api/analytics/organization/kpi` - Get HR KPI metrics and trends
+http://localhost:5000/api/analytics/organization/kpi?fields=trainingCompletion,surveyParticipation
 
 
 
