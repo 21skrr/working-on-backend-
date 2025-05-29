@@ -4,8 +4,12 @@ const onboardingController = require("../controllers/onboardingController");
 const { auth } = require("../middleware/auth");
 const roleCheck = require("../middleware/roleCheck");
 const checklistController = require("../controllers/checklistController");
+const reportController = require("../controllers/reportController");
 
 const router = express.Router();
+
+// GET /api/reports/export - Export custom reports
+router.get('/export', auth, reportController.exportCustomReport);
 
 // HR: Get onboarding reports
 // GET /api/reports/onboarding

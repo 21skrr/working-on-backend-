@@ -12,7 +12,7 @@
 - `GET /api/reports/personal/tasks` - Get completed tasks report
 - `GET /api/reports/personal/sessions` - Get attended sessions report
 - `GET /api/reports/personal/feedback` - Get submitted feedback report
-- `GET /api/reports/personal/performance` - Get individual performance summary (if permitted)
+- `GET /api/reports/personal/performance` - Get individual performance summary (if permitted)## ma khedamach o ghaaa kat 3seb waste of time db
 
 ## Supervisor Role Endpoints
 
@@ -56,6 +56,16 @@
 ### Report Management
 - `GET /api/reports/templates` - Get all report templates
 - `POST /api/reports/templates` - Create a new report template
+{
+  "name": "Personal Progress Report change test",
+  "description": "Individual progress tracking report",
+  "type": "progress",
+  "configuration": {
+    "reportType": "progress",
+    "userFilter": "individual"
+  },
+  "is_system_template": false 
+}
 - `PUT /api/reports/templates/:id` - Update a report template
 - `DELETE /api/reports/templates/:id` - Delete a report template
 - `POST /api/reports/schedule` - Schedule automatic report delivery
@@ -63,10 +73,7 @@
 - `DELETE /api/reports/schedule/:id` - Delete report schedule
 
 ### Data Export
-- `GET /api/reports/export/audit` - Export detailed reports for audits
-- `GET /api/reports/export/compliance` - Export compliance reports
-- `GET /api/reports/export/leadership` - Export leadership reports
-- `GET /api/reports/export/custom` - Export custom reports
+- `GET /api/reports/export 
 
 ### Detailed Analytics
 - `GET /api/analytics/organization/user/:userId` - Get detailed user-level data

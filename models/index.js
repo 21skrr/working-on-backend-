@@ -34,6 +34,13 @@ const AnalyticsDashboard = require("./AnalyticsDashboard");
 const AnalyticsMetric = require("./AnalyticsMetric");
 const Department = require("./Department");
 const EvaluationCriteria = require("./EvaluationCriteria");
+const UserCourse = require("./UserCourse");
+const ReportSchedule = require("./ReportSchedule")(sequelize);
+const ReportTemplate = require("./ReportTemplate")(sequelize);
+const Report = require("./Report")(sequelize);
+if (Report.associate) {
+  Report.associate({ User });
+}
 
 // Initialize notification models
 const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
@@ -44,8 +51,8 @@ User.hasOne(OnboardingProgress);
 OnboardingProgress.belongsTo(User);
 
 // Department associations
-Department.hasMany(User, { foreignKey: 'department', as: 'departmentUsers' });
-User.belongsTo(Department, { foreignKey: 'department', as: 'departmentInfo' });
+Department.hasMany(User, { foreignKey: 'departmentId', as: 'departmentUsers' });
+User.belongsTo(Department, { foreignKey: 'departmentId', as: 'departmentInfo' });
 
 User.hasMany(Task, { foreignKey: "userId" });
 Task.belongsTo(User, { foreignKey: "userId" });
@@ -192,7 +199,12 @@ NotificationSettings.belongsTo(User);
 // OnboardingTask associations
 OnboardingTask.hasMany(UserTaskProgress, { foreignKey: "OnboardingTaskId" });
 
-// UserTaskProgress associations - These are now defined in the model itself
+// UserTaskProgress associations
+UserTaskProgress.belongsTo(OnboardingTask, { foreignKey: 'OnboardingTaskId', as: 'onboardingTask' });
+
+// UserCourse associations
+UserCourse.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
+Course.hasMany(UserCourse, { foreignKey: 'courseId', as: 'userCourses' });
 
 // Feedback Form and Submission associations
 FeedbackForm.hasMany(FeedbackSubmission, {
@@ -317,7 +329,12 @@ module.exports = {
   notification_preferences: NotificationPreference,
   analytics_dashboards: AnalyticsDashboard,
   analytics_metrics: AnalyticsMetric,
-  Department
+  Department,
+  EvaluationCriteria,
+  UserCourse,
+  ReportSchedule,
+  ReportTemplate,
+  Report,
 };
 
 console.log("Registered models:", Object.keys(module.exports));

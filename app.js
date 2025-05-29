@@ -29,12 +29,30 @@ const organizationAnalyticsRoutes = require('./routes/organizationAnalyticsRoute
 const personalAnalyticsRoutes = require('./routes/personalAnalyticsRoutes');
 const teamAnalyticsRoutes = require('./routes/teamAnalyticsRoutes');
 const departmentAnalyticsRoutes = require('./routes/departmentAnalyticsRoutes');
+const personalReportsRoutes = require('./routes/personalReportsRoutes');
+const teamReportsRoutes = require("./routes/teamReportsRoutes");
+const managerReportsRoutes = require("./routes/managerReportsRoutes");
+const departmentReportsRoutes = require("./routes/departmentReportsRoutes");
+const reportTemplateRoutes = require("./routes/reportTemplateRoutes");
+const reportScheduleRoutes = require("./routes/reportScheduleRoutes");
 
 const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Custom middleware to log query parameters after parsing
+app.use((req, res, next) => {
+    console.log('Query parameters after middleware:', req.query);
+    next();
+});
+
+// Dedicated test route for query parameters - placed early
+app.get('/test-query', (req, res) => {
+    console.log('Received query parameters in /test-query:', req.query);
+    res.status(200).json({ receivedQuery: req.query });
+});
 
 // Static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -70,6 +88,12 @@ app.use('/api/analytics/organization', organizationAnalyticsRoutes);
 app.use('/api/analytics/personal', personalAnalyticsRoutes);
 app.use('/api/analytics/team', teamAnalyticsRoutes);
 app.use('/api/analytics/department', departmentAnalyticsRoutes);
+app.use('/api/reports/personal', personalReportsRoutes);
+app.use("/api/reports/team", teamReportsRoutes);
+app.use("/api/reports", managerReportsRoutes);
+app.use("/api/reports", departmentReportsRoutes);
+app.use("/api/reports", reportTemplateRoutes);
+app.use("/api/reports", reportScheduleRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
