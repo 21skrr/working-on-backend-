@@ -115,7 +115,58 @@ const getOnboardingHealthReport = async (req, res) => {
     }
 };
 
+// GET /api/reports/evaluations - Get evaluation reports
+const getEvaluationReports = async (req, res) => {
+    try {
+        const { supervisorId, departmentId, startDate, endDate, programType } = req.query;
+        const where = {};
+        const include = [
+            { model: User, as: "employee", attributes: ['id', 'name', 'departmentId', 'supervisorId', 'programType'], include: [{ model: Department, as: 'departmentInfo', attributes: ['id', 'name'] }] },
+            { model: User, as: "supervisor", attributes: ['id', 'name'] },
+        ];
+
+        if (supervisorId) {
+            where.evaluatorId = supervisorId; // Filter by the supervisor who created the evaluation
+        }
+
+        if (departmentId) {
+            // Filter by the department of the employee being evaluated
+            include[0].include[0].where = { id: departmentId };
+        }
+
+        if (programType) {
+            include[0].where = { ...include[0].where, programType };
+        }
+
+        if (startDate && endDate) {
+            where.createdAt = {
+                [Op.between]: [new Date(startDate), new Date(endDate)],
+            };
+        } else if (startDate) {
+            where.createdAt = {
+                [Op.gte]: new Date(startDate),
+            };
+        } else if (endDate) {
+            where.createdAt = {
+                [Op.lte]: new Date(endDate),
+            };
+        }
+
+        const evaluations = await Evaluation.findAll({
+            where,
+            include,
+        });
+
+        res.status(200).json(evaluations);
+
+    } catch (error) {
+        console.error('Error fetching evaluation reports:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     getSupervisorActivityReport,
     getOnboardingHealthReport,
+    getEvaluationReports,
 }; 

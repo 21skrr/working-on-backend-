@@ -21,7 +21,11 @@ const EvaluationCriteria = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    score: {
+    criteria: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    rating: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -34,5 +38,12 @@ const EvaluationCriteria = sequelize.define(
     timestamps: true,
   }
 );
+
+// Remove association to EvaluationCriteria as it's part of the same model concept
+// EvaluationCriteria.associate = (models) => {
+//   EvaluationCriteria.belongsTo(models.Evaluation, {
+//     foreignKey: "evaluationId",
+//   });
+// };
 
 module.exports = EvaluationCriteria;

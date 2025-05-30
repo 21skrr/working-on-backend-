@@ -24,6 +24,11 @@ const auth = async (req, res, next) => {
 
 const checkRole = (...roles) => {
   return (req, res, next) => {
+    console.log('Checking role for user:', req.user?.role);
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ error: "Access denied." });
     }

@@ -17,14 +17,6 @@ const Evaluation = sequelize.define(
         key: "id",
       },
     },
-    supervisorId: {
-      type: DataTypes.CHAR(36),
-      allowNull: false,
-      references: {
-        model: "Users",
-        key: "id",
-      },
-    },
     type: {
       type: DataTypes.ENUM(
         "3-month",

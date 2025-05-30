@@ -3,6 +3,7 @@ const router = express.Router();
 const { check } = require("express-validator");
 const userController = require("../controllers/userController");
 const { auth, checkRole } = require("../middleware/auth");
+const evaluationController = require("../controllers/evaluationController");
 
 // Validation middleware
 const userValidation = [
@@ -60,5 +61,13 @@ router.get(
 router.get("/me", auth, (req, res) => {
   res.json({ id: req.user.id, email: req.user.email, role: req.user.role });
 });
+
+// GET /api/users/:id/evaluations - Get all evaluations related to a specific employee
+router.get(
+  "/:id/evaluations", // This path is relative to where the router is mounted (/api/users)
+  auth,
+  checkRole("hr", "supervisor", "manager"), // Assuming these roles can view employee evaluations
+  evaluationController.getEmployeeEvaluations // Use the existing controller function
+);
 
 module.exports = router;

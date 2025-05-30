@@ -35,6 +35,7 @@ const managerReportsRoutes = require("./routes/managerReportsRoutes");
 const departmentReportsRoutes = require("./routes/departmentReportsRoutes");
 const reportTemplateRoutes = require("./routes/reportTemplateRoutes");
 const reportScheduleRoutes = require("./routes/reportScheduleRoutes");
+const evaluationCriteriaRoutes = require("./routes/evaluationCriteriaRoutes");
 
 const app = express();
 // Middleware
@@ -94,6 +95,7 @@ app.use("/api/reports", managerReportsRoutes);
 app.use("/api/reports", departmentReportsRoutes);
 app.use("/api/reports", reportTemplateRoutes);
 app.use("/api/reports", reportScheduleRoutes);
+app.use("/api/evaluationcriteria", evaluationCriteriaRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
