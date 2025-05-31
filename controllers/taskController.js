@@ -1,6 +1,8 @@
 const { Task, User, UserTaskProgress } = require("../models");
 const { validationResult } = require("express-validator");
 const { v4: uuidv4 } = require("uuid");
+const logActivity = require("../utils/logActivity");
+
 
 // Get user's tasks
 const getUserTasks = async (req, res) => {
@@ -63,6 +65,15 @@ const createTask = async (req, res) => {
       controlledBy,
       isCompleted: false,
     });
+    await logActivity({
+      userId: req.user.id,
+      action: "task_created",
+      entityType: "task",
+      entityId: task.id,
+      details: task,
+      req
+    });
+    
 
     res.status(201).json(task);
   } catch (error) {
@@ -108,6 +119,15 @@ const updateTask = async (req, res) => {
       controlledBy: controlledBy || task.controlledBy,
       isCompleted: isCompleted !== undefined ? isCompleted : task.isCompleted,
     });
+    await logActivity({
+      userId: req.user.id,
+      action: "task_updated",
+      entityType: "task",
+      entityId: task.id,
+      details: req.body,
+      req
+    });
+    
 
     res.json(task);
   } catch (error) {
@@ -131,6 +151,14 @@ const deleteTask = async (req, res) => {
     }
 
     await task.destroy();
+    await logActivity({
+      userId: req.user.id,
+      action: "task_deleted",
+      entityType: "task",
+      entityId: task.id,
+      req
+    });
+    
     res.json({ message: "Task deleted successfully" });
   } catch (error) {
     console.error("Error deleting task:", error);
@@ -205,6 +233,15 @@ const updateTaskProgress = async (req, res) => {
       notes: notes || taskProgress.notes,
       completedAt: isCompleted ? new Date() : null,
     });
+    await logActivity({
+      userId,
+      action: "task_progress_updated",
+      entityType: "task",
+      entityId: taskId,
+      details: req.body,
+      req
+    });
+    
 
     res.json(taskProgress);
   } catch (error) {

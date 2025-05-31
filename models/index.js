@@ -38,9 +38,16 @@ const UserCourse = require("./UserCourse");
 const ReportSchedule = require("./ReportSchedule")(sequelize);
 const ReportTemplate = require("./ReportTemplate")(sequelize);
 const Report = require("./Report")(sequelize);
+const Resource = require("./Resource");
+const ResourceAssignment = require("./ResourceAssignment");
+const ActivityLog = require("./ActivityLog");
 if (Report.associate) {
   Report.associate({ User });
 }
+if (ActivityLog.associate) {
+  ActivityLog.associate({ User, Resource });
+}
+
 
 // Initialize notification models
 const NotificationTemplate = require('./notificationTemplate')(sequelize, Sequelize.DataTypes);
@@ -90,7 +97,7 @@ SurveyResponse.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 // SurveyResponse and SurveyQuestionResponse associations
 SurveyResponse.hasMany(SurveyQuestionResponse, { foreignKey: "surveyResponseId", as: "questionResponses" });
-SurveyQuestionResponse.belongsTo(SurveyResponse, { foreignKey: "surveyResponseId" });
+SurveyQuestionResponse.belongsTo(SurveyQuestionResponse, { foreignKey: "surveyResponseId" });
 
 // SurveyQuestion and SurveyQuestionResponse associations
 SurveyQuestion.hasMany(SurveyQuestionResponse, { foreignKey: "questionId" });
@@ -285,6 +292,9 @@ Feedback.hasMany(FeedbackFollowup, {
 Survey.hasMany(SurveySchedule, { foreignKey: 'surveyId', as: 'schedules' });
 SurveySchedule.belongsTo(Survey, { foreignKey: 'surveyId', as: 'survey' });
 
+// Add association from User to ActivityLog
+User.hasMany(ActivityLog, { foreignKey: 'userId' });
+
 // Initialize associations
 Object.keys(module.exports).forEach((modelName) => {
   if (module.exports[modelName].associate) {
@@ -335,6 +345,9 @@ module.exports = {
   ReportSchedule,
   ReportTemplate,
   Report,
+  Resource,
+  ResourceAssignment,
+  ActivityLog,
 };
 
 console.log("Registered models:", Object.keys(module.exports));

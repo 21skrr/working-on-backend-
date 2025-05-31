@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 const { v4: uuidv4 } = require('uuid');
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
-
+const logActivity = require("../utils/logActivity");
 // Get sent feedback
 const getSentFeedback = async (req, res) => {
   try {
@@ -169,6 +169,15 @@ const createFeedback = async (req, res) => {
       message: content,
       isAnonymous: isAnonymous ? 1 : 0
     });
+    await logActivity({
+      userId: req.user.id,
+      action: "feedback_submitted",
+      entityType: "feedback",
+      entityId: feedback.id,
+      details: feedback,
+      req
+    });
+    
 
     // Include user information in response
     const feedbackWithUser = await Feedback.findByPk(feedback.id, {
@@ -704,6 +713,15 @@ const respondToFeedback = async (req, res) => {
 
     // Update feedback status to match the note status
     await feedback.update({ status });
+    await logActivity({
+      userId: req.user.id,
+      action: "feedback_responded",
+      entityType: "feedback",
+      entityId: feedback.id,
+      details: { status, response },
+      req
+    });
+    
 
     // Include user information in response
     const noteWithUser = await FeedbackNote.findByPk(feedbackNote.id, {

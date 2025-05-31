@@ -4,6 +4,7 @@ const { User, OnboardingProgress } = require("../models");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto"); // Add crypto module for SHA256
+const logActivity = require("../utils/logActivity");
 
 // Function to hash password with SHA256
 const hashPasswordSHA256 = (password) => {
@@ -99,6 +100,14 @@ const login = async (req, res) => {
     // Create JWT token
     const token = generateToken(user);
     console.log("Token generated successfully");
+    await logActivity({
+      userId: user.id,
+      action: "user_logged_in",
+      entityType: "user",
+      entityId: user.id,
+      req
+    });
+    
 
     // Remove password from response
     const userResponse = user.toJSON();
@@ -210,7 +219,16 @@ const createUser = async (req, res) => {
       department,
       startDate,
       programType,
+    })
+    await logActivity({
+      userId: user.id,
+      action: "user_registered",
+      entityType: "user",
+      entityId: user.id,
+      details: { email, role },
+      req
     });
+    
 
     res.status(201).json({
       id: user.id,
@@ -344,7 +362,13 @@ const updatePassword = async (req, res) => {
 
     // Update password
     await user.update({ passwordHash: hashedPassword });
-
+    await logActivity({
+      userId: req.user.id,
+      action: "password_updated",
+      entityType: "user",
+      entityId: req.user.id,
+      req
+    });    
     res.json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("Error updating password:", error);
@@ -359,7 +383,16 @@ const logout = async (req, res) => {
   try {
     // Clear the token from localStorage (handled by frontend)
     // Backend just needs to return success
-    res.status(200).json({ message: "Logged out successfully" });
+   await logActivity({
+  userId: req.user.id,
+  action: "user_logged_out",
+  entityType: "user",
+  entityId: req.user.id,
+  req
+});
+
+res.status(200).json({ message: "Logged out successfully" });
+
   } catch (error) {
     console.error("Logout error:", error);
     res.status(500).json({ message: "Server error during logout" });

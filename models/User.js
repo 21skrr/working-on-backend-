@@ -96,6 +96,9 @@ User.associate = (models) => {
     foreignKey: 'userId',
     as: 'surveyResponses'
   });
+
+  // Add association with ActivityLog
+  User.hasMany(models.ActivityLog, { foreignKey: 'userId', as: 'ActivityLogs' });
 };
 
 User.prototype.checkPassword = function (password) {
