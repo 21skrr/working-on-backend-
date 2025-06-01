@@ -4,6 +4,7 @@ const path = require("path");
 const { sequelize } = require("./models");
 const errorHandler = require("./middleware/errorHandler");
 
+
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -37,6 +38,7 @@ const reportTemplateRoutes = require("./routes/reportTemplateRoutes");
 const reportScheduleRoutes = require("./routes/reportScheduleRoutes");
 const evaluationCriteriaRoutes = require("./routes/evaluationCriteriaRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
+const hrRoutes = require("./routes/hrRoutes");
 
 const app = express();
 // Middleware
@@ -77,7 +79,7 @@ app.use("/api/coaching", coachingRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/surveys", surveyRoutes);
-app.use("/api/team", teamRoutes);
+app.use("/api/teams", teamRoutes);
 app.use("/api/programs", programRoutes);
 app.use("/api/checklists", checklistRoutes);
 app.use("/api/checklist-items", checklistItemRoutes);
@@ -98,6 +100,7 @@ app.use("/api/reports", reportTemplateRoutes);
 app.use("/api/reports", reportScheduleRoutes);
 app.use("/api/evaluationcriteria", evaluationCriteriaRoutes);
 app.use("/api/resources", resourceRoutes);
+app.use("/api", hrRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

@@ -1,8 +1,12 @@
 {
   "name": "pmi-onboarding-portal-backend",
   "version": "1.0.0",
+  "type": "commonjs",
+
   "description": "Backend for PMI Onboarding Portal",
   "main": "server.js",
+
+
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"

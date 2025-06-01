@@ -6,6 +6,8 @@ const { v4: uuidv4 } = require('uuid');
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const logActivity = require("../utils/logActivity");
+const { getSystemSetting } = require("../utils/systemSettingsService");
+
 // Get sent feedback
 const getSentFeedback = async (req, res) => {
   try {
@@ -161,14 +163,24 @@ const createFeedback = async (req, res) => {
       toDepartment = user.department;
     }
 
-    const feedback = await Feedback.create({
-      fromUserId: req.user.id,
-      toUserId,
-      toDepartment,
-      type,
-      message: content,
-      isAnonymous: isAnonymous ? 1 : 0
-    });
+   // Get feedback notification template from system settings
+const notificationTemplate = await getSystemSetting("feedbackNotificationTemplate");
+
+// Replace placeholders in the template with actual content
+const finalMessage = notificationTemplate
+  ?.replace("{{sender}}", req.user.name)
+  ?.replace("{{message}}", content)
+  || content; // Fallback to original content if template is missing
+
+const feedback = await Feedback.create({
+  fromUserId: req.user.id,
+  toUserId,
+  toDepartment,
+  type,
+  message: finalMessage,
+  isAnonymous: isAnonymous ? 1 : 0
+});
+
     await logActivity({
       userId: req.user.id,
       action: "feedback_submitted",

@@ -401,11 +401,12 @@ const submitResponse = async (req, res) => {
         }
       }
     }
-
+    const surveyAnonymity = await getSystemSetting("surveyAnonymity");
+    const isAnonymous = surveyAnonymity === true || surveyAnonymity === "true";
     // Create the survey response
     const surveyResponse = await SurveyResponse.create({
       surveyId: survey.id,
-      userId: req.user.id,
+      userId: isAnonymous ? null : req.user.id,
       status: 'completed',
       submittedAt: new Date()
     }, { transaction });
@@ -437,6 +438,7 @@ const submitResponse = async (req, res) => {
 
     res.status(201).json({
       message: "Survey response submitted successfully",
+      isAnonymous,
       responseId: surveyResponse.id,
       submittedAt: surveyResponse.submittedAt,
       responses: questionResponses.map(qr => ({
@@ -446,6 +448,7 @@ const submitResponse = async (req, res) => {
         selectedOption: qr.selectedOption
       }))
     });
+    
   } catch (error) {
     // If anything fails, rollback the transaction
     await transaction.rollback();

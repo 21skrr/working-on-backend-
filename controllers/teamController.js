@@ -1,6 +1,7 @@
 const { Team, User, Feedback } = require("../models");
 const { Op } = require("sequelize");
 const sequelize = require("../config/database");
+const models = require("../models");
 
 // Get team feedback
 const getTeamFeedback = async (req, res) => {
@@ -308,6 +309,76 @@ const deleteTeam = async (req, res) => {
   }
 };
 
+// @desc    Get team settings
+// @route   GET /api/teams/settings
+// @access  Private (Supervisor, HR, Admin)
+const getTeamSettings = async (req, res) => {
+  try {
+    // Ensure the authenticated user is a supervisor, HR, or Admin
+    if (!['supervisor', 'hr', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden: Only supervisors, HR, or Admins can view team settings.' });
+    }
+
+    // Find the team settings for the user's team
+    const teamSettings = await models.TeamSettings.findOne({
+      where: { teamId: req.user.teamId },
+    });
+
+    if (!teamSettings) {
+      // If settings don't exist, create default settings for this team
+      const defaultSettings = await models.TeamSettings.create({
+        teamId: req.user.teamId,
+        // Default values will be applied from the model definition
+      });
+      return res.json(defaultSettings); // Return the newly created default settings
+    }
+
+    res.json(teamSettings);
+  } catch (error) {
+    console.error("Error fetching team settings:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// @desc    Update team settings
+// @route   PUT /api/teams/settings
+// @access  Private (Supervisor, HR, Admin)
+const updateTeamSettings = async (req, res) => {
+  try {
+    // Ensure the authenticated user is a supervisor, HR, or Admin
+    if (!['supervisor', 'hr', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden: Only supervisors, HR, or Admins can update team settings.' });
+    }
+
+    // Find the team settings for the user's team
+    let teamSettings = await models.TeamSettings.findOne({
+      where: { teamId: req.user.teamId },
+    });
+
+    if (!teamSettings) {
+      // If settings don't exist, create them first with provided updates
+      const updateData = { teamId: req.user.teamId, ...req.body };
+      const newSettings = await models.TeamSettings.create(updateData);
+      return res.json({ message: "Team settings created and updated successfully.", teamSettings: newSettings });
+    }
+
+    // Update allowed fields from request body
+    const allowedUpdates = ['reportFilters', 'coachingAlertsEnabled'];
+    allowedUpdates.forEach(field => {
+      if (req.body[field] !== undefined) {
+        teamSettings[field] = req.body[field];
+      }
+    });
+
+    await teamSettings.save(); // Save the updated settings
+
+    res.json({ message: "Team settings updated successfully.", teamSettings });
+  } catch (error) {
+    console.error("Error updating team settings:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getTeamMembers,
   getTeamById,
@@ -315,5 +386,7 @@ module.exports = {
   updateTeam,
   deleteTeam,
   getTeamFeedback,
-  getTeamFeedbackAnalytics
+  getTeamFeedbackAnalytics,
+  getTeamSettings,
+  updateTeamSettings,
 };

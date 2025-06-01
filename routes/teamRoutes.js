@@ -18,6 +18,16 @@ router.get("/feedback", auth, teamController.getTeamFeedback);
 // @access  Private
 router.get("/feedback/analytics", auth, teamController.getTeamFeedbackAnalytics);
 
+// @route   GET /api/teams/settings
+// @desc    Get team settings
+// @access  Private (Supervisor, HR, Admin)
+router.get("/settings", auth, teamController.getTeamSettings);
+
+// @route   PUT /api/teams/settings
+// @desc    Update team settings
+// @access  Private (Supervisor, HR, Admin)
+router.put("/settings", auth, teamController.updateTeamSettings);
+
 // @route   GET /api/team/:id
 // @desc    Get team by ID
 // @access  Private

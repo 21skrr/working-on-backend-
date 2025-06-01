@@ -70,4 +70,40 @@ router.get(
   evaluationController.getEmployeeEvaluations // Use the existing controller function
 );
 
+// Employee Settings Endpoints
+
+// GET /api/users/usersettings/me - View personal settings for the authenticated user
+router.get(
+  "/usersettings/me", // Changed from /usersettings/:userId
+  auth, // Authentication required
+  // Authorization to view own settings is implicit by using req.user.id in controller
+  userController.getUserSettings
+);
+
+// PUT /api/users/usersettings/me - Update personal preferences for the authenticated user
+router.put(
+  "/usersettings/me", // Changed from /usersettings/:userId
+  auth, // Authentication required
+  // Authorization to update own settings is implicit by using req.user.id in controller
+  userController.updateUserSettings
+);
+
+// Manager Preferences Endpoints
+
+// GET /api/users/managers/me/preferences - View manager preferences for the authenticated manager
+router.get(
+  "/managers/me/preferences",
+  auth,
+  // Role check for manager is done in the controller
+  userController.getManagerPreferences
+);
+
+// PUT /api/users/managers/me/preferences - Update manager preferences for the authenticated manager
+router.put(
+  "/managers/me/preferences",
+  auth,
+  // Role check for manager is done in the controller
+  userController.updateManagerPreferences
+);
+
 module.exports = router;

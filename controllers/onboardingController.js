@@ -14,7 +14,7 @@ const { validationResult } = require("express-validator");
 const { Op } = require("sequelize");
 const { Parser } = require("json2csv");
 const { v4: uuidv4 } = require("uuid");
-
+const { getSystemSetting } = require("../utils/systemSettingsService");
 // Employee: Get my onboarding progress
 // GET /api/onboarding/journey
 const getMyProgress = async (req, res) => {
@@ -491,45 +491,45 @@ const exportOnboardingCSV = async (req, res) => {
 
 // HR: Assign checklists to an employee
 // POST /api/onboarding/checklists/assign
+// HR: Assign checklists to an employee
+// POST /api/onboarding/checklists/assign
 const assignChecklists = async (req, res) => {
   try {
     const { userId, checklistIds } = req.body;
 
-    if (!userId || !checklistIds || !Array.isArray(checklistIds)) {
+    if (!userId || !Array.isArray(checklistIds)) {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
-    // Verify the user has permission
     if (req.user.role !== "hr" && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    // Check if user exists
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if checklists exist
     const checklists = await Checklist.findAll({
       where: { id: { [Op.in]: checklistIds } },
     });
 
     if (checklists.length !== checklistIds.length) {
-      return res
-        .status(400)
-        .json({ message: "One or more checklists not found" });
+      return res.status(400).json({ message: "One or more checklists not found" });
     }
 
-    // Create checklist assignments
+    // ✅ Get onboarding rules dynamically inside the function
+    const onboardingRules = await getSystemSetting("onboardingRules");
+    const deadlineDays = onboardingRules?.deadlineDays || 14;
+
     const assignments = [];
     for (const checklistId of checklistIds) {
-      const [assignment, created] = await ChecklistAssignment.findOrCreate({
-        where: { userId: userId, checklistId: checklistId },
+      const [assignment] = await ChecklistAssignment.findOrCreate({
+        where: { userId, checklistId },
         defaults: {
           id: uuidv4(),
           assignedBy: req.user.id,
-          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+          dueDate: new Date(Date.now() + deadlineDays * 24 * 60 * 60 * 1000),
           status: "assigned",
           completionPercentage: 0,
           isAutoAssigned: false,
@@ -549,6 +549,7 @@ const assignChecklists = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 // HR: Reset employee's journey
 // POST /api/onboarding/journey/:userId/reset

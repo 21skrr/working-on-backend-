@@ -41,9 +41,15 @@ const Report = require("./Report")(sequelize);
 const Resource = require("./Resource");
 const ResourceAssignment = require("./ResourceAssignment");
 const ActivityLog = require("./ActivityLog");
-if (Report.associate) {
-  Report.associate({ User });
-}
+const UserSetting = require("./UserSetting")(sequelize);
+const TeamSettings = require('./TeamSettings')(sequelize);
+const ManagerPreference = require('./ManagerPreference')(sequelize);
+const SystemSetting = require("./SystemSetting")(sequelize);
+const Role = require("./Role");
+
+
+
+
 if (ActivityLog.associate) {
   ActivityLog.associate({ User, Resource });
 }
@@ -301,6 +307,15 @@ Object.keys(module.exports).forEach((modelName) => {
     module.exports[modelName].associate(module.exports);
   }
 });
+if (UserSetting.associate) {
+  UserSetting.associate({ User });
+}
+if (TeamSettings.associate) {
+  TeamSettings.associate({ Team });
+}
+if (ManagerPreference.associate) {
+  ManagerPreference.associate({ User });
+}
 
 // Export models and connection
 module.exports = {
@@ -348,6 +363,11 @@ module.exports = {
   Resource,
   ResourceAssignment,
   ActivityLog,
+  UserSetting,
+  TeamSettings,
+  ManagerPreference,
+  SystemSetting,
+  Role,
 };
 
-console.log("Registered models:", Object.keys(module.exports));
+
