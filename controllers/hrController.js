@@ -1,6 +1,7 @@
-const models = require("../models");
-const { SystemSetting } = require("../models");
-const { Role } = require("../models");
+const { SystemSetting, Role, ActivityLog } = require("../models");
+const logActivity = require("../utils/logActivity");
+const crypto = require("crypto");
+
 
 // @desc    Get global system settings
 // @route   GET /api/systemsettings
@@ -27,24 +28,42 @@ const getSystemSettings = async (req, res) => {
 // @desc    Update global system settings
 // @route   PUT /api/systemsettings
 // @access  Private (HR, Admin)
+
 const updateSystemSettings = async (req, res) => {
-    try {
-      const entries = Object.entries(req.body);
-  
-      for (const [key, val] of entries) {
-        await SystemSetting.upsert({
-          key,
-          value: val, // model setter handles stringify
-          updatedBy: req.user.id
-        });
-      }
-  
-      res.json({ message: "Settings updated successfully." });
-    } catch (err) {
-      console.error("Error updating system settings:", err);
-      res.status(500).json({ message: "Server error" });
+  try {
+    const entries = Object.entries(req.body);
+
+    // Optional validation
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ message: "Request body must be a key-value object." });
     }
-  };
+
+    for (const [key, val] of entries) {
+      // Update or insert system setting
+      await SystemSetting.upsert({
+        key,
+        value: val, // Sequelize model setter will handle stringify
+        updatedBy: req.user.id
+      });
+
+      // Log the update action
+      await logActivity({
+        userId: req.user.id,
+        action: "update",
+        entityType: "SystemSetting",
+        entityId: key,
+        details: { newValue: val },
+        req
+      });
+    }
+
+    res.json({ message: "Settings updated successfully." });
+  } catch (err) {
+    console.error("Error updating system settings:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
   
   
   

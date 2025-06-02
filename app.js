@@ -39,6 +39,7 @@ const reportScheduleRoutes = require("./routes/reportScheduleRoutes");
 const evaluationCriteriaRoutes = require("./routes/evaluationCriteriaRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
 const hrRoutes = require("./routes/hrRoutes");
+const activityLogRoutes = require('./routes/activityLogRoutes');
 
 const app = express();
 // Middleware
@@ -101,6 +102,7 @@ app.use("/api/reports", reportScheduleRoutes);
 app.use("/api/evaluationcriteria", evaluationCriteriaRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api", hrRoutes);
+app.use('/api/activitylogs', activityLogRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
