@@ -1,9 +1,9 @@
-const { User, OnboardingProgress } = require("../models");
+const express = require("express");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const models = require("../models"); // Import models object
-const { ManagerPreference } = require("../models"); // Explicitly import ManagerPreference
+const models = require("../models");
+const { User, ManagerPreference } = require("../models"); // Add User import
 const scheduleFeedbackCyclesForUser = require("../utils/autoScheduleFeedback");
 
 // Get all users (admin only)
@@ -326,6 +326,28 @@ const updateManagerPreferences = async (req, res) => {
   } catch (error) {
     console.error("Error updating manager preferences:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Add this function
+const getUsersWithoutOnboarding = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      where: {
+        role: 'employee' // or whatever role should have onboarding
+      },
+      include: [{
+        model: OnboardingProgress,
+        required: false
+      }],
+      having: sequelize.literal('COUNT(OnboardingProgresses.id) = 0'),
+      group: ['User.id']
+    });
+    
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users without onboarding:', error);
+    res.status(500).json({ message: 'Failed to fetch users' });
   }
 };
 

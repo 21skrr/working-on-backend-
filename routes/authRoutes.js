@@ -42,17 +42,38 @@ const updatePasswordValidation = [
     .withMessage("New password must be at least 6 characters long"),
 ];
 
-// ✅ Routes
-router.post("/register", registerValidation, authController.register);
-router.post("/login", loginValidation, authController.login);
+// ✅ Routes with body parsing middleware for POST/PUT routes
+router.post("/register", 
+  express.json(),
+  express.urlencoded({ extended: true }),
+  registerValidation, 
+  authController.register
+);
+
+router.post("/login", 
+  express.json(),
+  express.urlencoded({ extended: true }),
+  loginValidation, 
+  authController.login
+);
+
 router.get("/me", auth, authController.getMe);
+
 router.put(
   "/password/:id",
+  express.json(),
+  express.urlencoded({ extended: true }),
   auth,
   updatePasswordValidation,
   authController.updatePassword
 );
-router.post("/logout", auth, authController.logout);
+
+router.post("/logout", 
+  express.json(),
+  express.urlencoded({ extended: true }),
+  auth, 
+  authController.logout
+);
 
 // ✅ Export the router
 module.exports = router;

@@ -1,7 +1,8 @@
-const { Team, User, Feedback } = require("../models");
+const express = require("express");
 const { Op } = require("sequelize");
 const sequelize = require("../config/database");
 const models = require("../models");
+const { User, Team, Feedback } = require("../models"); // Add model imports
 
 // Get team feedback
 const getTeamFeedback = async (req, res) => {

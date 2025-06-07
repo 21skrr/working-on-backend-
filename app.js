@@ -4,7 +4,6 @@ const path = require("path");
 const { sequelize } = require("./models");
 const errorHandler = require("./middleware/errorHandler");
 
-
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -42,10 +41,11 @@ const hrRoutes = require("./routes/hrRoutes");
 const activityLogRoutes = require('./routes/activityLogRoutes');
 
 const app = express();
-// Middleware
+
+// Middleware - MUST be before routes
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Custom middleware to log query parameters after parsing
 app.use((req, res, next) => {
@@ -69,7 +69,8 @@ app.get("/api/test", (req, res) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/teams', teamRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/events", eventRoutes);
@@ -80,7 +81,6 @@ app.use("/api/coaching", coachingRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/surveys", surveyRoutes);
-app.use("/api/teams", teamRoutes);
 app.use("/api/programs", programRoutes);
 app.use("/api/checklists", checklistRoutes);
 app.use("/api/checklist-items", checklistItemRoutes);
@@ -111,5 +111,22 @@ app.use(errorHandler);
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
+
+// 2. Check Content-Type Header
+
+// Make sure you have the correct header:
+// - **Key**: `Content-Type`
+// - **Value**: `application/json`
+
+// 3. Fix the App.js File
+
+// The main issue is still in your app.js file. You need to remove the problematic middleware at the end. Here's the corrected version:
+// app.use((req, res, next) => {
+//   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+//     express.json()(req, res, next);
+//   } else {
+//     next();
+//   }
+// });
 
 module.exports = app;

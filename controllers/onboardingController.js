@@ -773,6 +773,33 @@ const updateUserNotificationSettings = async (req, res) => {
   }
 };
 
+// HR: Delete onboarding progress for an employee (optional)
+// DELETE /api/onboarding/journey/:userId
+const deleteUserProgress = async (req, res) => {
+  try {
+    // Verify the user has permission
+    if (req.user.role !== "hr" && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const progress = await OnboardingProgress.findOne({
+      where: { UserId: req.params.userId },
+    });
+
+    if (!progress) {
+      return res.status(404).json({ message: "Onboarding progress not found" });
+    }
+
+    // Delete the progress
+    await progress.destroy();
+
+    res.json({ message: "Onboarding progress deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting onboarding progress:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   getMyProgress,
   getUserProgress,
@@ -789,4 +816,5 @@ module.exports = {
   updateNotificationSettings,
   getNotificationSettings,
   updateUserNotificationSettings,
+  deleteUserProgress, // Add this line
 };

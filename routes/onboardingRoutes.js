@@ -33,6 +33,8 @@ router.get(
 router.put(
   "/journey",
   [
+    express.json(),
+    express.urlencoded({ extended: true }),
     auth,
     check("progress", "Progress must be a number between 0 and 100")
       .optional()
@@ -46,6 +48,8 @@ router.put(
 router.put(
   "/journey/:userId",
   [
+    express.json(),
+    express.urlencoded({ extended: true }),
     auth,
     roleCheck(["hr", "supervisor"]),
     check("stage", "Stage must be prepare, orient, land, integrate, or excel")
@@ -63,6 +67,8 @@ router.put(
 router.post(
   "/checklists/assign",
   [
+    express.json(),
+    express.urlencoded({ extended: true }),
     auth,
     roleCheck(["hr", "admin"]),
     check("userId", "User ID is required").exists(),
@@ -76,6 +82,8 @@ router.post(
 router.post(
   "/journey/:userId/reset",
   [
+    express.json(),
+    express.urlencoded({ extended: true }),
     auth,
     roleCheck(["hr", "admin"]),
     check(
@@ -88,6 +96,15 @@ router.post(
   onboardingController.resetJourney
 );
 
+// HR: Delete onboarding progress for employee (optional)
+// DELETE /api/onboarding/journey/:userId
+router.delete(
+  "/journey/:userId",
+  auth,
+  roleCheck(["hr", "admin"]),
+  onboardingController.deleteUserProgress
+);
+
 // Keeping the following routes for backward compatibility
 // GET /api/onboarding/:id
 router.get("/:id", auth, onboardingController.getOnboardingProgress);
@@ -96,6 +113,8 @@ router.get("/:id", auth, onboardingController.getOnboardingProgress);
 router.put(
   "/:id",
   [
+    express.json(),
+    express.urlencoded({ extended: true }),
     auth,
     roleCheck(["hr", "supervisor"]),
     check("stage", "Stage must be prepare, orient, land, integrate, or excel")

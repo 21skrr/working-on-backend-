@@ -1,196 +1,663 @@
-# API Endpoints Documentation
+API Endpoints Reference (for Backend)
 
-## Table of Contents
-1. [Authentication](#authentication)
-2. [User Management](#user-management)
-3. [Role-Based Endpoints](#role-based-endpoints)
-   - [HR & Admin](#hr--admin)
-   - [Manager](#manager)
-   - [Supervisor](#supervisor)
-   - [Employee](#employee)
-4. [Common Features](#common-features)
-5. [Notes](#notes)
+Authentication
+--------------
+POST /auth/login  
+Request Body:
+{
+  "email": "string",
+  "password": "string"
+}
+Returns: { token: string, user: { id: string, email: string, role: string, ... } }
 
-## Authentication
+POST /auth/logout  
+Request Body: (none)  
+Returns: { success: true }
 
-### Base Authentication
-- `POST /api/auth/login`
-  - Request: `{ email: string, password: string }`
-  - Response: `{ token: string, user: { id, email, role, ... } }`
-- `POST /api/auth/logout`
-  - Response: `{ success: true }`
-- `GET /api/auth/me`
-  - Response: `{ id, email, role, ... }`
+GET /auth/me  
+Request Body: (none)  
+Returns: { id: string, email: string, role: string, ... }
 
-## User Management
+User & Team Management
+---------------------
+GET /users  
+GET /users/:id  
 
-### User Operations
-- `GET /api/users` - List all users (HR/Admin only)
-- `POST /api/users` - Create new user (HR/Admin only)
-- `GET /api/users/:id` - Get user by ID
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user (HR only)
-- `GET /api/users/me` - Get current user info
-- `GET /api/users/team/members` - Get team members (Supervisor/Manager only)
+POST /users  
+Request Body:
+{
+  "email": "string",
+  "name": "string",
+  "role": "string"
+}
 
-### User Settings
-- `GET /api/users/usersettings/me` - View personal settings
-- `PUT /api/users/usersettings/me` - Update personal settings
-- `GET /api/users/managers/me/preferences` - View manager preferences
-- `PUT /api/users/managers/me/preferences` - Update manager preferences
+PUT /users/:id  
+Request Body:
+{
+  "name": "string (optional)",
+  "role": "string (optional)"
+}
 
-## Role-Based Endpoints
+DELETE /users/:id  
+GET /teams
+GET /teams/:id
+POST /teams  
 
-### HR & Admin
+Programs & Onboarding
+---------------------
+GET /programs  
+GET /programs/:id  
+DELETE /programs/:id  
 
-#### System Settings
-- `GET /api/systemsettings` - Get global system settings
-- `PUT /api/systemsettings` - Update global system settings
+Calendar & Events
+----------------
+GET /events  
+GET /events/:id  
 
-#### Role Management
-- `GET /api/roles` - List all roles and permissions
-- `POST /api/roles` - Create new role
-- `PUT /api/roles/:id` - Update role permissions
-- `DELETE /api/roles/:id` - Delete role
+POST /events  
+Request Body:
+{
+  "title": "string",
+  "date": "string",
+  "time": "string",
+  "location": "string",
+  "attendees": 0,
+  "type": "string"
+}
 
-#### Survey Management
-- `GET /api/surveys` - Get all surveys
-- `POST /api/surveys` - Create new survey
-- `PUT /api/surveys/:id` - Update survey
-- `DELETE /api/surveys/:id` - Delete survey
-- `POST /api/surveys/templates` - Create survey template
-- `PUT /api/surveys/templates/:templateId` - Update survey template
-- `POST /api/surveys/schedule` - Schedule survey
-- `PUT /api/surveys/settings` - Update survey settings
-- `GET /api/surveys/export` - Export survey results
-- `GET /api/surveys/monitoring` - Monitor survey participation
-- `GET /api/surveys/department/analytics` - Get department analytics
-- `GET /api/surveys/department/insights` - Get department insights
+PUT /events/:id  
+Request Body:
+{
+  "title": "string (optional)",
+  "date": "string (optional)",
+  "time": "string (optional)"
+}
 
-#### Feedback Management
-- `GET /api/feedback/all` - View all feedback
-- `PUT /api/feedback/:feedbackId/categorize` - Categorize feedback
-- `POST /api/feedback/:feedbackId/escalate` - Escalate feedback
-- `GET /api/feedback/export` - Export feedback report
+DELETE /events/:id  
 
-#### Analytics & Reports
-- `GET /api/analytics/organization/dashboard` - Organization-wide dashboard
-- `GET /api/analytics/organization/completion-rates` - Completion rates by department
-- `GET /api/analytics/organization/feedback-participation` - Feedback participation metrics
-- `GET /api/analytics/organization/survey-trends` - Survey response trends
-- `GET /api/analytics/organization/training-completion` - Training completion metrics
-- `GET /api/analytics/organization/evaluation-effectiveness` - Evaluation effectiveness
-- `GET /api/analytics/organization/kpi` - HR KPI metrics
+Checklists & Onboarding Progress
+--------------------------------
+GET /api/onboarding/journey  
+GET /api/onboarding/journey/:userId  
+PUT /api/onboarding/journey/:userId  
+DELETE /api/onboarding/journey/:userId  
+GET /api/onboarding/progresses  
 
-#### Report Management
-- `GET /api/reports/templates` - Get report templates
-- `POST /api/reports/templates` - Create report template
-- `PUT /api/reports/templates/:id` - Update report template
-- `DELETE /api/reports/templates/:id` - Delete report template
-- `POST /api/reports/schedule` - Schedule report delivery
-- `PUT /api/reports/schedule/:id` - Update report schedule
-- `DELETE /api/reports/schedule/:id` - Delete report schedule
+GET /checklists  
+GET /checklists/:id  
 
-### Manager
+POST /checklists  
+Request Body:
+{
+  "title": "string",
+  "items": [
+    { "text": "string" }
+  ]
+}
 
-#### Team Management
-- `GET /api/users/team/members` - Get team members
-- `GET /api/surveys/team/results` - Get team survey results
-- `GET /api/surveys/team/completion-status` - Get team survey completion status
-- `GET /api/surveys/monitoring` - Monitor survey participation
-- `GET /api/surveys/export` - Export survey results
-- `GET /api/surveys/department/analytics` - Get department analytics
-- `GET /api/surveys/department/insights` - Get department insights
+PUT /checklists/:id  
+Request Body:
+{
+  "title": "string (optional)",
+  "items": [
+    { "id": "string", "text": "string", "completed": true }
+  ]
+}
 
-#### Analytics & Reports
-- `GET /api/analytics/department/dashboard` - Department-wide dashboard
-- `GET /api/analytics/department/onboarding-kpi` - Onboarding KPIs
-- `GET /api/analytics/department/probation` - Probation milestone tracking
-- `GET /api/analytics/department/evaluations` - Evaluation results comparison
-- `GET /api/analytics/department/feedback` - Feedback trends
-- `GET /api/reports/supervisor-activity` - Supervisor activity reports
-- `GET /api/reports/onboarding-health` - Onboarding health metrics
-- `POST /api/reports/schedule/department` - Schedule department reports
-- `GET /api/reports/export/department` - Export department reports
+DELETE /checklists/:id  
 
-### Supervisor
+Notifications
+-------------
+GET /api/notifications  
+GET /api/notifications/reminders  
+GET /api/notifications/feedback-availability  
+GET /api/notifications/documents  
+GET /api/notifications/training  
+GET /api/notifications/coaching-sessions  
+GET /api/notifications/team-progress  
+GET /api/notifications/overdue-tasks  
+GET /api/notifications/feedback-submissions  
+GET /api/notifications/probation-deadlines  
+GET /api/notifications/onboarding-milestones  
+GET /api/notifications/pending-approvals  
+GET /api/notifications/team-followups  
+GET /api/notifications/summary-reports  
+GET /api/notifications/system-alerts  
+GET /api/notifications/new-employees  
+GET /api/notifications/feedback-checkpoints  
+GET /api/notifications/weekly-reports  
+GET /api/notifications/compliance-alerts  
+GET /api/notifications/leave-requests  
 
-#### Team Management
-- `GET /api/users/team/members` - Get team members
-- `GET /api/surveys/team/results` - Get team survey results
-- `GET /api/surveys/team/completion-status` - Get team survey completion status
-- `GET /api/surveys/monitoring` - Monitor survey participation
-- `GET /api/surveys/export` - Export survey results
+Notification Preferences
+------------------------
+GET /api/notifications/preferences  
 
-#### Analytics & Reports
-- `GET /api/analytics/team/dashboard` - Team-level analytics dashboard
-- `GET /api/analytics/team/checklist-progress` - Checklist progress per employee
-- `GET /api/analytics/team/training` - Training participation and completion
-- `GET /api/analytics/team/feedback` - Feedback trends
-- `GET /api/analytics/team/coaching` - Coaching session tracking
-- `GET /api/reports/team/export` - Export team reports
-- `GET /api/reports/team/bottlenecks` - Onboarding bottlenecks analysis
-- `GET /api/reports/team/performance` - Team performance reports
+PUT /api/notifications/preferences  
+Request Body:
+{
+  "emailNotifications": {
+    "checklistAssignments": true,
+    "reminders": true,
+    "feedbackForms": true,
+    "documents": true,
+    "coachingSessions": true
+  },
+  "inAppNotifications": {
+    "checklistAssignments": true,
+    "reminders": true,
+    "feedbackForms": true,
+    "documents": true,
+    "coachingSessions": true
+  },
+  "pushNotifications": {
+    "checklistAssignments": false,
+    "reminders": true,
+    "feedbackForms": true,
+    "documents": false,
+    "coachingSessions": true
+  },
+  "frequency": "daily",
+  "quietHours": {
+    "enabled": true,
+    "start": "22:00",
+    "end": "08:00"
+  }
+}
 
-### Employee
+PUT /api/notifications/:notificationId/read  
+PUT /api/notifications/read-all  
+DELETE /api/notifications/:notificationId  
 
-#### Personal Management
-- `GET /api/users/:id` - Get user by ID
-- `PUT /api/users/:id` - Update user
-- `GET /api/users/me` - Get current user info
-- `GET /api/users/usersettings/me` - View personal settings
-- `PUT /api/users/usersettings/me` - Update personal settings
+Notification Templates
+----------------------
+GET /api/notifications/templates  
+POST /api/notifications/templates  
+PUT /api/notifications/templates/:templateId  
+DELETE /api/notifications/templates/:templateId  
 
-#### Survey Management
-- `GET /api/surveys/available` - Get available surveys
-- `GET /api/surveys/user` - Get user's surveys
-- `GET /api/surveys/history` - Get survey history
-- `GET /api/surveys/:id` - Get survey by ID
+Reports & Analytics  
+-------------------  
 
-#### Analytics & Reports
-- `GET /api/analytics/personal/dashboard` - Personal analytics dashboard
-- `GET /api/analytics/personal/onboarding` - Personal onboarding analytics
-- `GET /api/analytics/personal/checklist` - Checklist completion percentage
-- `GET /api/analytics/personal/training` - Training progress
-- `GET /api/analytics/personal/feedback` - Feedback history
-- `GET /api/reports/personal/tasks` - Completed tasks report
-- `GET /api/reports/personal/sessions` - Attended sessions report
-- `GET /api/reports/personal/feedback` - Submitted feedback report
-- `GET /api/reports/personal/performance` - Individual performance summary
+EMPLOYEE:  
+GET /api/analytics/personal/dashboard  
+GET /api/analytics/personal/onboarding  
+GET /api/analytics/personal/checklist  
+GET /api/analytics/personal/training  
+GET /api/analytics/personal/feedback  
 
-## Common Features
+GET /api/reports/personal/tasks  
+GET /api/reports/personal/sessions  
+GET /api/reports/personal/feedback  
+GET /api/reports/personal/performance  
 
-### Export Formats
-- JSON (default)
-- CSV
-- Excel (.xlsx)
-- PDF
+SUPERVISOR:  
+GET /api/analytics/team/dashboard  
+GET /api/analytics/team/checklist-progress  
+GET /api/analytics/team/training  
+GET /api/analytics/team/feedback  
+GET /api/analytics/team/coaching  
 
-### Filtering Options
-- Date range
-- Department
-- Team
-- Program type
-- Role
-- Status
-- Custom metrics
+GET /api/reports/team/export  
+GET /api/reports/team/bottlenecks  
+GET /api/reports/team/performance  
 
-### Report Scheduling Options
-- Daily
-- Weekly
-- Monthly
-- Quarterly
-- Custom intervals
+MANAGER:  
+GET /api/analytics/department/dashboard  
+GET /api/analytics/department/onboarding-kpi  
+GET /api/analytics/department/probation  
+GET /api/analytics/department/evaluations  
+GET /api/analytics/department/feedback  
 
-## Notes
-1. All endpoints are prefixed with `/api`
-2. Role hierarchy: HR > Manager > Supervisor > Employee
-3. Higher roles inherit access to lower role endpoints
-4. All endpoints require authentication
-5. Role-based access control is implemented
-6. Data access is restricted based on role hierarchy
-7. Audit logging for sensitive data access
-8. Pagination implemented for large datasets
-9. Caching implemented for frequently accessed reports
-10. Real-time analytics available where applicable
-11. Custom date ranges supported for all reports 
+GET /api/reports/supervisor-activity  
+GET /api/reports/onboarding-health  
+
+POST /api/reports/schedule/department  
+Request Body:
+{
+  "department": "string",
+  "interval": "weekly | monthly",
+  "metrics": ["onboarding", "feedback"]
+}
+
+GET /api/reports/export/department  
+
+HR:  
+GET /api/analytics/organization/dashboard  
+GET /api/analytics/organization/completion-rates  
+GET /api/analytics/organization/feedback-participation  
+GET /api/analytics/organization/survey-trends  
+GET /api/analytics/organization/training-completion  
+GET /api/analytics/organization/evaluation-effectiveness  
+
+GET /api/reports/templates  
+
+POST /api/reports/templates  
+Request Body:
+{
+  "name": "string",
+  "description": "string",
+  "type": "progress",
+  "configuration": {
+    "reportType": "progress",
+    "userFilter": "individual"
+  },
+  "is_system_template": false
+}
+
+PUT /api/reports/templates/:id  
+DELETE /api/reports/templates/:id  
+
+POST /api/reports/schedule  
+Request Body:
+{
+  "templateId": "string",
+  "frequency": "weekly | monthly",
+  "targetRoles": ["employee", "supervisor"]
+}
+
+PUT /api/reports/schedule/:id  
+DELETE /api/reports/schedule/:id  
+
+GET /api/analytics/organization/user/:userId  
+GET /api/analytics/organization/program/:programId  
+GET /api/analytics/organization/kpi  
+
+Resources – Endpoints by Role  
+-----------------------------  
+
+EMPLOYEE:  
+GET /resources  
+GET /resources/:id  
+POST /resources/:id/download  
+
+SUPERVISOR:  
+GET /resources  
+GET /resources/usage?employeeId=...  
+
+POST /resources/assign  
+Request Body:
+{
+  "userId": "string",
+  "resourceId": "string",
+  "reason": "string (optional)"
+}
+
+MANAGER:  
+GET /resources/summary  
+GET /resources/recommendations  
+
+HR:  
+POST /resources  
+Request Body:
+{
+  "title": "string",
+  "description": "string",
+  "url": "string",
+  "type": "document | link | video | other",
+  "stage": "prepare | orient | land | integrate | excel",
+  "programType": "string (optional)"
+}
+
+PUT /resources/:id  
+Request Body:
+{
+  "title": "string",
+  "description": "string",
+  "url": "string",
+  "stage": "string",
+  "programType": "string"
+}
+
+DELETE /resources/:id  
+GET /resources  
+GET /resources/analytics  
+
+Settings – Endpoints by Role  
+----------------------------  
+
+EMPLOYEE:  
+GET /usersettings/:userId  
+
+PUT /usersettings/:userId  
+Request Body:
+{
+  "theme": "light | dark | system",
+  "emailNotifications": true,
+  "pushNotifications": true,
+  "profileVisibility": "everyone | team | supervisors",
+  "compactMode": true
+}
+
+SUPERVISOR:  
+GET /teams/settings  
+
+PUT /teams/settings  
+Request Body:
+{
+  "reportFilters": { },
+  "coachingAlertsEnabled": true
+}
+
+MANAGER:  
+GET /managers/:id/preferences  
+
+PUT /managers/me/preferences  
+Request Body:
+{
+  "alertThresholds": {
+    "onboardingProgressBelow": 60
+  },
+  "notificationFrequency": "daily | weekly"
+}
+
+HR:  
+GET /systemsettings  
+
+PUT /systemsettings  
+Request Body:
+{
+  "onboardingRules": { },
+  "feedbackCycles": [3, 6, 12],
+  "surveyAnonymity": true,
+  "autoAssignChecklists": true,
+  "notificationTemplates": { }
+}
+
+GET /roles  
+POST /roles  
+PUT /roles/:id  
+DELETE /roles/:id  
+
+Survey API Endpoints  
+--------------------
+
+EMPLOYEE:  
+GET /api/surveys/available  
+
+POST /api/surveys/:surveyId/respond  
+Request Body:
+{
+  "responses": [
+    {
+      "questionId": "string",
+      "rating": 4
+    },
+    {
+      "questionId": "string",
+      "selectedOption": "string"
+    },
+    {
+      "questionId": "string",
+      "answer": "string"
+    }
+  ]
+}
+
+GET /api/surveys/history  
+
+SUPERVISOR:  
+GET /api/surveys/team/results  
+GET /api/surveys/team/completion-status  
+
+MANAGER:  
+GET /api/surveys/department/analytics  
+GET /api/surveys/department/insights  
+
+HR:  
+POST /api/surveys/templates  
+Request Body:
+{
+  "title": "string",
+  "description": "string",
+  "type": "6-month",
+  "targetRole": "employee",
+  "targetProgram": "inkompass",
+  "questions": [
+    {
+      "question": "string",
+      "type": "rating | multiple_choice | text",
+      "required": true,
+      "options": ["string"]
+    }
+  ]
+}
+
+POST /api/surveys/schedule  
+Request Body:
+{
+  "surveyTemplateId": "template123",
+  "schedule": {
+    "triggerType": "timeAfterJoining",
+    "triggerValue": 90,
+    "reminderDays": [7, 3, 1]
+  },
+  "targetAudience": {
+    "departments": ["all"],
+    "roles": ["new_employees"],
+    "joiningDateRange": {
+      "start": "2024-01-01",
+      "end": "2024-12-31"
+    }
+  }
+}
+
+GET /api/surveys/monitoring  
+GET /api/surveys/export  
+
+PUT /api/surveys/templates/:templateId  
+PUT /api/surveys/settings  
+Request Body:
+{
+  "autoScheduling": true,
+  "reminderSettings": {
+    "enabled": true,
+    "frequency": "weekly",
+    "maxReminders": 3
+  },
+  "anonymityRules": {
+    "defaultIsAnonymous": true,
+    "allowResponderChoice": false
+  },
+  "dataRetention": {
+    "keepResponsesForDays": 365,
+    "archiveAfterDays": 90
+  }
+}
+
+Evaluation Endpoints  
+--------------------
+
+EMPLOYEE:  
+GET /api/evaluations/user  
+GET /evaluations/:id  
+
+SUPERVISOR:  
+GET /evaluations  
+
+POST /evaluations  
+Request Body:
+{
+  "employeeId": "string",
+  "evaluatorId": "string",
+  "type": "performance",
+  "evaluationDate": "2023-10-27T10:00:00Z",
+  "status": "pending",
+  "comments": "string",
+  "ratings": {},
+  "title": "string",
+  "criteria": [
+    {
+      "category": "string",
+      "name": "string",
+      "weight": 0.3,
+      "description": "string",
+      "rating": 4,
+      "comments": "string"
+    }
+  ]
+}
+
+POST /evaluations/:evaluationId/criteria  
+Request Body:
+{
+  "category": "string",
+  "name": "string",
+  "rating": 4,
+  "comments": "string"
+}
+
+PUT /api/evaluationcriteria/:id  
+Request Body:
+{
+  "category": "string",
+  "name": "string",
+  "rating": 5,
+  "comments": "string"
+}
+
+PATCH /api/evaluations/:id/submit  
+Request Body:
+{
+  "scores": [
+    {
+      "criteriaId": "string",
+      "score": 4,
+      "comments": "string"
+    }
+  ]
+}
+
+GET /supervisors/:id/evaluations  
+
+MANAGER:  
+GET /evaluations  
+GET /evaluations/:id  
+
+PATCH /evaluations/:id/validate  
+Request Body:
+{
+  "status": "completed",
+  "reviewComments": "Evaluation reviewed and validated by HR department."
+}
+
+GET /reports/evaluations  
+
+HR:  
+GET /evaluations  
+POST /evaluations (same as above)  
+PUT /evaluations/:id  
+DELETE /evaluations/:id  
+
+GET /reports/evaluations  
+GET /evaluations/:evaluationId/criteria  
+DELETE /evaluationcriteria/:id  
+PATCH /evaluations/:id/validate (same as above)  
+GET /employees/:id/evaluations  
+
+Feedback API Endpoints  
+----------------------
+
+EMPLOYEE:  
+POST /api/feedback  
+Request Body:
+{
+  "type": "onboarding",
+  "content": "string",
+  "isAnonymous": false,
+  "shareWithSupervisor": true,
+  "category": "training"
+}
+
+GET /api/feedback/history  
+
+SUPERVISOR:  
+GET /api/team/feedback  
+
+POST /api/feedback/:feedbackId/response  
+Request Body:
+{
+  "response": "Thank you for your feedback. We will implement your suggestions in the next training session.",
+  "status": "addressed"
+}
+
+MANAGER:  
+GET /api/feedback/department  
+GET /api/feedback/analytics  
+
+HR:  
+GET /api/feedback/all  
+
+PUT /api/feedback/:feedbackId/categorize  
+Request Body:
+{
+  "categories": ["training", "supervisor", "process"],
+  "priority": "high",
+  "status": "under_review"
+}
+
+POST /api/feedback/:feedbackId/escalate  
+Request Body:
+{
+  "escalateTo": "manager",
+  "reason": "Requires immediate attention",
+  "notifyParties": ["supervisor", "hr"]
+}
+
+GET /api/feedback/export  
+
+Admin Panel Endpoints  
+---------------------
+
+USER MANAGEMENT:  
+GET /users  
+POST /users  
+PUT /users/:id  
+DELETE /users/:id  
+PATCH /users/:id/status  
+
+TEAM MANAGEMENT:  
+GET /teams  
+POST /teams  
+PUT /teams/:id  
+DELETE /teams/:id  
+
+ROLE & PERMISSION MANAGEMENT:  
+GET /roles  
+POST /roles  
+PUT /roles/:id  
+DELETE /roles/:id  
+
+PROGRAMS & STRUCTURE:  
+GET /programs  
+POST /programs  
+PUT /programs/:id  
+DELETE /programs/:id  
+
+SYSTEM SETTINGS:  
+GET /systemsettings  
+PUT /systemsettings (see above for request body)  
+
+ACTIVITY LOGS:  
+GET /activitylogs  
+
+EVALUATIONS:  
+GET /evaluations  
+POST /evaluations  
+PUT /evaluations/:id  
+
+FEEDBACK & SURVEYS:  
+GET /feedback  
+GET /surveys  
+POST /surveys  
+PUT /surveys/:id  
+
+REPORTING & ANALYTICS:  
+GET /reports  
+POST /reports/run  
+GET /analytics/overview  
+
+NOTIFICATIONS:  
+GET /notifications  
+POST /notifications  
+PUT /notificationtemplates/:id  
